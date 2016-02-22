@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="lab-multimodal-dialogue-systems">Lab: Multimodal Dialogue Systems</h2>
+<p><a href="http://www.iristk.net">IrisTK</a> is a an open source Java-based framework for developing conversational systems, developed at KTH. In this lab, you will experiment with a Quiz game application, where two users can play a quiz with an animated agent.</p>
+<h3 id="preparation-before-the-lab">Preparation before the lab</h3>
+<ol style="list-style-type: decimal">
+<li>IrisTK uses an XML-based formalism for controlling the flow of the dialogue. Thus, the lab requires some basic familiarity with XML. If you don't have that, please read through <a href="http://www.xmlnews.org/docs/xml-basics.html">this tutorial</a> (or some other tutorial you find on the web).</li>
+<li>Read through these instructions to get an idea of what the lab is about. Check the reference at the end of this document to get an idea of what the XML flow looks like and what the different elements mean.</li>
+<li>Please bring a pair of headphones (with standard 3.5mm plug) to the lab, if you have one!</li>
+</ol>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>The lab requires the following things, in case you would like to test out the lab on your own:</p>
+<ol style="list-style-type: decimal">
+<li>A computer running Windows 7 or 8, English version.</li>
+<li>Eclipse and Java installed</li>
+<li><a href="http://us.playstation.com/ps3/accessories/singstar-microphones-ps2-ps3.html">Singstar microphones</a> (wired or wireless).</li>
+</ol>
+<h3 id="preparation-at-the-lab">Preparation at the lab</h3>
+<h4 id="download-and-install-iristk">Download and install IrisTK</h4>
+<ol style="list-style-type: decimal">
+<li>We have created a minimum installer for IrisTK. You might have to tell the browser that you allow the file to be executed, or even rename the file, if necessary.
+<ul>
+<li><a href="iristk-min.exe">32 bit version</a></li>
+<li><a href="iristk-min-64.exe">64 bit version</a></li>
+</ul></li>
+<li>Follow the installation instructions. Accept the default location if you don't have a good reason for choosing a different location. Please note the location for later use.</li>
+<li>Open a <a href="http://pcsupport.about.com/od/windows7/a/command-prompt-windows-7.htm">command window</a> and run &quot;iristk eclipse quiz&quot;</li>
+<li>Open Eclipse from the start menu, set the workspace if you have not already done so before</li>
+<li>Choose &quot;File&quot; &gt; &quot;Import&quot; &gt; &quot;General&quot; &gt; &quot;Existing Projects into Workspace&quot;</li>
+<li>Select the IrisTK root directory (where you chose to install IrisTK) and press &quot;Finish&quot;</li>
+</ol>
+<h4 id="headphones">Headphones</h4>
+<p>Please bring your own headphones, we only have a limited number. Plug in two pairs of headphones in the computer, using a splitter (provided by the lab assistant).</p>
+<h4 id="microphones">Microphones</h4>
+<p>Microphones are provided by the lab assistant. We use regular Singstar microphones.</p>
+<ol style="list-style-type: decimal">
+<li>Plug in the stereo microphones and wait until windows have detected them</li>
+<li>Right-click on the speaker icon in the bottom right corner of the screen and choose &quot;Recording devices&quot;</li>
+<li>Make sure the &quot;USBMIC&quot; microphone is selected as default (green symbol). You should see the level bars move when you speak in the microphones.</li>
+<li>Select the &quot;USBMIC&quot; microphone and choose Properties</li>
+<li>Open the &quot;Levels&quot; tab and set the level to 22</li>
+<li>Open the &quot;Advanced&quot; tab and set the format to 2 channels, DVD quality</li>
+<li>Close all sound control windows by pressing OK</li>
+</ol>
+<p>The person on the left should have the red microphone and the person on the right the blue microphone</p>
+<h4 id="test-the-quiz-game">Test the Quiz game</h4>
+<ol style="list-style-type: decimal">
+<li>Open Eclipse</li>
+<li>Locate &quot;app/quiz/src&quot; in the Package explorer</li>
+<li>Right click QuizSystem.java and choose &quot;Run As&quot; &gt; &quot;Java Application&quot;</li>
+<li>Make sure you don't get any errors (red text) in the Console view in Eclipse. Warnings can be safely ignored.</li>
+<li>Make sure the IrisTK window and the Agent are visible</li>
+<li>In the Situation view, double-click in front the the system agent in order to add one or two users to the interaction (see picture below). The system should start speaking. You can drag the users to move them around, in which case the agent should follow them with the gaze. You can also remove the users by double-clicking on them, which should end the dialog.</li>
+<li>Again, make sure you don't get any errors (red text) in the Console view in Eclipse.</li>
+<li>To stop the game, press the red square in the Console view in Eclipse. This is important, so that you don't run several instances simultaneously.</li>
+</ol>
+<p><img src="screenshot.png" style="width:100%"/></p>
+<h4 id="understand-the-flow-and-the-grammar">Understand the flow and the grammar</h4>
+<ol style="list-style-type: decimal">
+<li>Locate QuizFlow.xml in &quot;app/quiz/src&quot; and double-click to open it. This files defines the interaction.</li>
+<li>Locate QuizGrammar.xml in &quot;app/quiz/src&quot; and double-click to open it. This files defines things the user can say (apart from answers to questions). The format is SRGS, <a href="http://www.w3.org/TR/speech-grammar/">Speech Recognition Grammar Specification</a>.<br /></li>
+<li>Try to understand the structure of the flow and play the game in different ways. Try to understand how different events are handled in the flow.
+<ul>
+<li>What happens if you say &quot;no&quot; when the agent asks if you want to play?</li>
+<li>What happens if the agent asks the question to one person and the other person answers?</li>
+<li>What happens if the agent asks the question to both persons and both answer at the same time?</li>
+</ul></li>
+<li>Locate &quot;questions.txt&quot; in &quot;app/quiz/src&quot;, which contains the questions that the system asks. If you want, you can change the questions. Each line contains seven columns (separated with semicolon): (1) the question, (2) the correct answer, (3-5) wrong alternatives, (6) the category, and (7) the difficulty.</li>
+</ol>
+<h4 id="program-and-compile-the-flow">Program and compile the flow</h4>
+<ol style="list-style-type: decimal">
+<li>Go to the state named Idle and change what the system says when the dialog starts (in the &lt;dialog:say&gt; element)</li>
+<li>The XML is dynamically checked by Eclipse for syntactic errors. Look out for red marks in the right margin of the editor window which indicate errors.</li>
+<li>Before the changes take effect, you must compile the XML flow:
+<ul>
+<li>Locate app &gt; quiz &gt; build.xml, right click on it and choose &quot;Run As&quot; &gt; &quot;Ant Build&quot;</li>
+<li>You should see the results of the compilation in the Console view. Make sure no errors are reported. Note that errors are not necessarily printed in red. The flow XML has now been converted to Java.</li>
+<li><strong>Important</strong>: Refresh the IrisTK folder by selecting it and pressing F5. You need to do this every time you have compiled the flow in order for Eclipse to compile the Java source code to byte code.</li>
+<li>Make sure that there were no errors in this final step. If there were errors, you will see a red mark next to QuizFlow.java in the Package Explorer.</li>
+</ul></li>
+<li>Run the game again and confirm that your changes have taken effect.</li>
+</ol>
+<h3 id="exercises">Exercises</h3>
+<p>You are now ready for some exercises! Try to solve as many as you can, given the time you have. You don't have to do the exercises in the specified order.</p>
+<h4 id="make-the-systems-utterances-more-varied">Make the system's utterances more varied</h4>
+<p>The dialogue can be much more engaging and natural if you add variations to what the system says. Add alternative utterances throughout the flow and see the effects.</p>
+<p><em>Tip</em>: Enclose actions with the &lt;random&gt; element to make random choices between actions:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;random&gt;</span>
+    <span class="kw">&lt;dialog:say&gt;</span>Would you like to play a game with me?<span class="kw">&lt;/dialog:say&gt;</span>
+    <span class="kw">&lt;dialog:say&gt;</span>Are you up for some game?<span class="kw">&lt;/dialog:say&gt;</span>
+<span class="kw">&lt;/random&gt;</span></code></pre>
+<h4 id="extend-the-grammar">Extend the grammar</h4>
+<p>The things the user can say are defined in the speech recognition grammar QuizGrammar.xml. It is currently very limited. Add more alternative things the user can say for &quot;yes&quot; and &quot;no&quot;.</p>
+<p><em>Tip</em>: Check the <a href="http://www.w3.org/TR/speech-grammar/">Speech Recognition Grammar Specification</a> if you want to try more advanced constructions.</p>
+<p><strong>Note</strong>: You can only use letters and numbers in the grammar, no punctuation such as question marks.</p>
+<h4 id="avoiding-the-question">Avoiding the question</h4>
+<p>Add the possibility of saying &quot;I don't know&quot;, which should have the same effect as not saying anything (&quot;sense.user.silence&quot;).</p>
+<p><em>Tip</em>: Extend the QuizGrammar.xml with a new rule with a new semantic tag. Add an event handler to the AwaitAnswer state (at the right place) which makes the flow raise the &quot;skip&quot; event.</p>
+<h4 id="repeating-the-question">Repeating the question</h4>
+<p>The question is only read once and there is currently not way of getting the agent to repeat the question. If the user says &quot;can you read the question again&quot;, the agent should do so.</p>
+<h4 id="comment-on-the-users-performance">Comment on the users' performance</h4>
+<p>When a user has answered correctly, the system simply says &quot;That is correct&quot;. Use the current scores of the players to comment on their performance. For example, if a player has many points, the agent could say something like &quot;You seem to be very good at this!&quot;.</p>
+<p><em>Tip</em>: Use an &lt;if&gt; construction (see the rest of the CorrectAnswer state for examples, or check the reference below). To access the score you should use asInteger(&quot;users:current:score&quot;, 0). This makes sure that the value is treated as an integer, and gives it a default value of 0 if there is no score already.</p>
+<p>If you want, you could also take the other player's score into account. This can be accessed with &quot;users:other:score&quot;.</p>
+<h4 id="shifting-attention">Shifting attention</h4>
+<p>If the user says &quot;I don't know&quot; as an answer to the question, or does not answer at all, the system says &quot;Give me your best guess&quot; and listens for the answer again. If there are several users, make the system instead switch to the other player and ask &quot;Maybe you know the answer?&quot;.</p>
+<p><em>Tip</em>:</p>
+<ul>
+<li>A precondition for switching attention is that there are several users. You can test that with the condition &quot;users.hasMany()&quot;. Use an &lt;if&gt;,&lt;else&gt; construction (see the rest of the flow for examples).</li>
+<li>Switch attention with the action &lt;dialog:attendOther/&gt;</li>
+</ul>
+<h4 id="adding-gestures">Adding gestures</h4>
+<p>You can make the agent do gestures. Try to add some gestures to the flow that make sense. You make the agent do a gesture by issuing the following action:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;send</span><span class="ot"> event=</span><span class="st">&quot;action.gesture&quot;</span><span class="ot"> p:name=</span><span class="st">&quot;&#39;smile&#39;&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>See the reference further down for a complete list of gestures that the agent supports.</p>
+<h4 id="adding-categories">Adding categories</h4>
+<p>Each question has a category (Literature, Music, etc) specified. Before each question, the agent could state which category the next question is and then ask the user if (s)he wants to have that question or another one.</p>
+<p><em>Tip</em>: The category can be read back to the user with this action:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:say&gt;</span>The next question is about <span class="kw">&lt;expr&gt;</span>question:category<span class="kw">&lt;/expr&gt;&lt;/dialog:say&gt;</span></code></pre>
+<h4 id="restart-the-game">Restart the game</h4>
+<p>After the game, the system just says goodbye and goes to the Idle state. It should ask if the players want to play again. To speed up the game, you can change the number of points that are required for winning (defined in the variable &quot;winningScore&quot; which defaults to 3).</p>
+<h4 id="your-own-ideas">Your own ideas</h4>
+<p>Try to come up with interesting ways of improving the game! If you know how to program Java, you can of course also change other parts of the code than the flow.</p>
+<h4 id="clean-up">Clean up</h4>
+<p>If you do not want to keep the IrisTK folder in your roaming profile, you should delte it from there.</p>
+<h3 id="reference">Reference</h3>
+<p>This is what the initial version of the Quiz flow looks like:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;flow</span><span class="ot"> name=</span><span class="st">&quot;QuizFlow&quot;</span><span class="ot"> package=</span><span class="st">&quot;iristk.app.quiz&quot;</span> 
+<span class="ot">    initial=</span><span class="st">&quot;Idle&quot;</span><span class="ot"> xmlns=</span><span class="st">&quot;iristk.flow&quot;</span>
+<span class="ot">    xmlns:xsi=</span><span class="st">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="ot">    xmlns:p=</span><span class="st">&quot;iristk.flow.param&quot;</span>
+<span class="ot">    xmlns:dialog=</span><span class="st">&quot;iristk.situated.SituatedDialog&quot;</span>
+<span class="ot">    xsi:schemaLocation=</span><span class="st">&quot;iristk.flow flow.xsd iristk.situated.SituatedDialog SituatedDialog.xsd&quot;</span><span class="kw">&gt;</span>
+    
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;questions&quot;</span><span class="ot"> type=</span><span class="st">&quot;QuestionSet&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;dialog&quot;</span><span class="ot"> type=</span><span class="st">&quot;iristk.situated.SituatedDialog&quot;</span><span class="kw">/&gt;</span>
+    
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;users&quot;</span><span class="ot"> type=</span><span class="st">&quot;iristk.situated.UserModel&quot;</span><span class="ot"> value=</span><span class="st">&quot;dialog.getUsers()&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;question&quot;</span><span class="ot"> type=</span><span class="st">&quot;Question&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;guess&quot;</span><span class="ot"> type=</span><span class="st">&quot;int&quot;</span><span class="ot"> value=</span><span class="st">&quot;0&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;winningScore&quot;</span><span class="ot"> type=</span><span class="st">&quot;int&quot;</span><span class="ot"> value=</span><span class="st">&quot;3&quot;</span><span class="kw">/&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Idle&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:attendNobody</span> <span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.enter&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:attend</span><span class="ot"> target=</span><span class="st">&quot;event:agent&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Hi there<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestGame&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+        
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.leave&quot;</span><span class="ot">  cond=</span><span class="st">&quot;users.isAttending(event) or users.isAttendingAll()&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasAny()&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:attendRandom/&gt;</span>
+                <span class="kw">&lt;reentry/&gt;</span>
+            <span class="kw">&lt;else</span> <span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Goodbye&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestGame&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasMany()&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:attendAll/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Do you want to play a game?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak**&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;StartGame&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak**&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Okay, maybe another time then<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Goodbye&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak**&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;reentry/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;StartGame&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasMany()&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:attendAll/&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>Okay, let&#39;s play a game of quiz. The first to reach <span class="kw">&lt;expr&gt;</span>winningScore<span class="kw">&lt;/expr&gt;</span> points is the winner.<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>Okay, let&#39;s play a game of quiz. Let&#39;s try to see if you can get <span class="kw">&lt;expr&gt;</span>winningScore<span class="kw">&lt;/expr&gt;</span> points.<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;NextQuestion&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Goodbye&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Goodbye<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Idle&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;NextQuestion&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>question = questions.next(); guess = 0<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasMany()&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;random&gt;</span>
+                    <span class="kw">&lt;block&gt;</span>
+                        <span class="kw">&lt;dialog:attendOther/&gt;</span>
+                        <span class="kw">&lt;dialog:say&gt;</span>The next one is for you<span class="kw">&lt;/dialog:say&gt;</span>
+                    <span class="kw">&lt;/block&gt;</span>
+                    <span class="kw">&lt;block&gt;</span>
+                        <span class="kw">&lt;dialog:attendAll/&gt;</span>
+                        <span class="kw">&lt;dialog:say&gt;</span>Let&#39;s see who answers first<span class="kw">&lt;/dialog:say&gt;</span>
+                    <span class="kw">&lt;/block&gt;</span>
+                <span class="kw">&lt;/random&gt;</span>
+            <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>Here comes the next question<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;ReadQuestion&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;ReadQuestion&quot;</span><span class="ot"> extends=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:prompt</span><span class="ot"> text=</span><span class="st">&quot;question.getFullQuestion()&quot;</span><span class="ot"> grammar=</span><span class="st">&quot;asList(&#39;default&#39;, question.getId())&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;ReadOptions&quot;</span><span class="ot"> extends=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:prompt</span><span class="ot"> text=</span><span class="st">&quot;question.getOptions()&quot;</span><span class="ot"> grammar=</span><span class="st">&quot;asList(&#39;default&#39;, question.getId())&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:listen</span><span class="ot"> grammar=</span><span class="st">&quot;asList(&#39;default&#39;, question.getId())&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak.multi&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;eq(event:sem:answer,question:correct)&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:attend</span><span class="ot"> target=</span><span class="st">&quot;event:agent&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CorrectAnswer&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;eq(event:other:sem:answer,question:correct)&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;dialog:attend</span><span class="ot"> target=</span><span class="st">&quot;event:other:agent&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CorrectAnswer&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>None of you were correct, let&#39;s try another question.<span class="kw">&lt;/dialog:say&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;NextQuestion&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;eq(event:sem:answer,question:correct)&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CorrectAnswer&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;IncorrectAnswer&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak.side&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:attendOther</span><span class="ot"> mode=</span><span class="st">&quot;&#39;eyes&#39;&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>You were not supposed to answer that<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:attendOther</span><span class="ot"> mode=</span><span class="st">&quot;&#39;eyes&#39;&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>So, what is your answer?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.silence&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;raise</span><span class="ot"> event=</span><span class="st">&quot;skip&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;skip&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Give me your best guess<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;CorrectAnswer&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>users:current:score = asInteger(users:current:score,0) + 1<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>That is correct, you now have a score of <span class="kw">&lt;expr&gt;</span>users:current:score<span class="kw">&lt;/expr&gt;&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;asInteger(users:current:score,0) </span><span class="dv">&amp;gt;</span><span class="st">= winningScore&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Winner&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;NextQuestion&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;IncorrectAnswer&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>That was wrong<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasMany() and guess == 0&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;exec&gt;</span>guess++<span class="kw">&lt;/exec&gt;</span>
+                <span class="kw">&lt;dialog:attendOther/&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>Maybe you know the answer?<span class="kw">&lt;/dialog:say&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;AwaitAnswer&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>The correct answer was <span class="kw">&lt;expr&gt;</span>question:(question:correct)<span class="kw">&lt;/expr&gt;&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;NextQuestion&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Winner&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>users:current:score = 0<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Congratulations, you are the winner<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;users.hasMany()&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:attendOther/&gt;</span>
+                <span class="kw">&lt;exec&gt;</span>users:current:score = 0<span class="kw">&lt;/exec&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>I am sorry, but you lost.<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Goodbye&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+
+<span class="kw">&lt;/flow&gt;</span></code></pre>
+<p>The flow basically contains a number of variables and states. The flow is always in one particular state, but can change state through the action &lt;goto&gt;. Each state can be thought of as a collection of event handlers (starting with &quot;on&quot;), which in turn contain actions.</p>
+<p>Here is a reference of the different XML tags used in the quiz flow. You can try to use them in different ways. Note that some elements have the &quot;dialog:&quot; namespace prefix. These are calling actions that are defined in another flow, specifically designed for multi-party dialogue with an animated agent. Other elements are generic to all kinds of flow.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;guess&quot;</span><span class="ot"> type=</span><span class="st">&quot;int&quot;</span><span class="ot"> value=</span><span class="st">&quot;0&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>Defines a variable with a certain (Java) type and an initial value.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Winner&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span></code></pre>
+<p>Defines a state with an id. The state can extend another state, which means that all the event handlers of the extended state can also trigger. Thus, you can define generic event handlers in the &quot;Dialog&quot; state. However, there event handlers are checked after the event handlers of the current state are checked.</p>
+<h4 id="event-handlers">Event handlers</h4>
+<p>The flow contains two types of event handlers:</p>
+<ul>
+<li>&lt;onentry&gt;: Triggered when the state is entered.</li>
+<li>&lt;onevent name=&quot;eventname&quot; cond=&quot;condition&quot;&gt;: Triggered by an event. Optionally, a condition can be given for the event handler to trigger.</li>
+</ul>
+<p>When a user is entering or leaving the interaction, the following events are fired:</p>
+<pre class="sourceCode java"><code class="sourceCode java">sense.<span class="fu">user</span>.<span class="fu">enter</span>
+sense.<span class="fu">user</span>.<span class="fu">leave</span></code></pre>
+<p>When a listen action is issued (&lt;dialog:listen/&gt;), one of these events will be fired:</p>
+<pre class="sourceCode java"><code class="sourceCode java">sense.<span class="fu">user</span>.<span class="fu">speak</span>         <span class="co">// The current speaker has said something</span>
+sense.<span class="fu">user</span>.<span class="fu">speak</span>.<span class="fu">multi</span>   <span class="co">// Both users have said something</span>
+sense.<span class="fu">user</span>.<span class="fu">speak</span>.<span class="fu">side</span>    <span class="co">// The user not attended to has said something</span>
+sense.<span class="fu">user</span>.<span class="fu">silence</span>       <span class="co">// None of the users said anything</span></code></pre>
+<p>The contents of the spoken utterances can be accessed with:</p>
+<ul>
+<li>text: The text that was spoken</li>
+<li>sem: The semantic representation of what was spoken (a Record structure)</li>
+</ul>
+<p>Note that it is possible to use wildcards. Thus, the pattern &quot;sense.user.speak**&quot; catches all of the events above.</p>
+<h4 id="generic-actions">Generic Actions</h4>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Greeting&quot;</span> <span class="kw">/&gt;</span></code></pre>
+<p>Go to another state.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;COND1&quot;</span><span class="kw">&gt;</span>
+    ACTION1
+<span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;COND2&quot;</span><span class="kw">/&gt;</span>
+    ACTION2
+<span class="kw">&lt;else/&gt;</span>
+    ACTION3
+<span class="kw">&lt;/if&gt;</span></code></pre>
+<p>If COND1, do ACTION1, else if COND2, do ACTION2, else do ACTION3.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;reentry/&gt;</span></code></pre>
+<p>Enter the current state again, re-triggering the &lt;onEntry&gt; event handler.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;raise</span><span class="ot"> event=</span><span class="st">&quot;skip&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>Raises a custom event that can be caught with &lt;catch event=&quot;...&quot;&gt;</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;random&gt;</span>
+    <span class="kw">&lt;dialog:say&gt;</span>Hi there<span class="kw">&lt;/dialog:say&gt;</span>
+    <span class="kw">&lt;dialog:say&gt;</span>Nice to see you<span class="kw">&lt;/dialog:say&gt;</span>
+<span class="kw">&lt;/random&gt;</span></code></pre>
+<p>Randomly selects an action to execute (from any number of actions). If you want to group actions, you can enclose sequence of actions with a &lt;block&gt; element.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;exec&gt;</span>question = questions.next()<span class="kw">&lt;/exec&gt;</span></code></pre>
+<p>Executes Java code. Several statements can be separated with semicolon (;).</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;send</span><span class="ot"> event=</span><span class="st">&quot;action.gesture&quot;</span><span class="ot"> p:name=</span><span class="st">&quot;&#39;smile&#39;&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>Sends an event. &quot;action.gesture&quot; makes the agent do a gesture. The following gestures are supported:</p>
+<ul>
+<li>smile</li>
+<li>brow_raise</li>
+<li>brow_frown</li>
+<li>express_disgust</li>
+<li>express_sad</li>
+</ul>
+<h4 id="actions-related-to-multi-party-dialogue">Actions related to Multi-party dialogue</h4>
+<p>These are actions that control what the agent is doing (speaking, listening, attending, gesturing).</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:say&gt;</span>Would you like to play a game with me?<span class="kw">&lt;/dialog:say&gt;</span></code></pre>
+<p>Makes the agent say something.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:listen/&gt;</span></code></pre>
+<p>Makes the agent turn on the speech recogniser and listen to the user.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:attend</span><span class="ot"> target=</span><span class="st">&quot;event:agent&quot;</span> <span class="kw">/&gt;</span></code></pre>
+<p>Makes the agent attend to the user specified by &quot;target&quot;. In this case, the event parameter &quot;agent&quot; is used.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:attendAll/&gt;</span></code></pre>
+<p>Attend to both users at the same time. The agent will shift the gaze back and forth betwen the users to indicate this. Both users are allowed to answer.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:attendOther/&gt;</span></code></pre>
+<p>Attend to the user not currently attended to.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:attendRandom/&gt;</span></code></pre>
+<p>Attend to a randomly selected user.</p>
+<h4 id="other-event-handlers-and-actions">Other Event handlers and Actions</h4>
+<p>If you want to look at other things supported by the flow, but which are not used in the Quiz example, please refer to the <a href="http://www.iristk.net/irisflow_reference.html">IrisFlow reference</a>.</p>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

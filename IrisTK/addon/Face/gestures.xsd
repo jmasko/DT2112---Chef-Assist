@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:g="iristk.agent.face.gestures"
+	elementFormDefault="qualified" targetNamespace="iristk.agent.face.gestures">
+
+	<element name="gestures">
+		<complexType>
+			<sequence>
+				<element ref="g:gesture" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+			<attribute name="framerate" use="optional" default="50" type="int" />
+		</complexType>
+	</element>
+
+	<element name="gesture">
+		<complexType>
+			<sequence>
+				<element name="param" minOccurs="0" maxOccurs="unbounded">
+					<complexType mixed="true">
+						<attribute name="name" use="required">
+							<simpleType>
+								<restriction base="string">
+									<enumeration value="EXPR_ANGER"/>
+									<enumeration value="EXPR_DISGUST"/>
+									<enumeration value="EXPR_FEAR"/>
+									<enumeration value="EXPR_SAD"/>
+									
+									<enumeration value="SMILE_CLOSED"/>
+									<enumeration value="SMILE_OPEN"/>
+									<enumeration value="SURPRISE"/>
+									
+									<enumeration value="BLINK_LEFT"/>
+									<enumeration value="BLINK_RIGHT"/>
+									
+									<enumeration value="BROW_DOWN_LEFT"/>
+									<enumeration value="BROW_DOWN_RIGHT"/>
+									<enumeration value="BROW_IN_LEFT"/>
+									<enumeration value="BROW_IN_RIGHT"/>
+									
+									<enumeration value="BROW_UP_LEFT"/>
+									<enumeration value="BROW_UP_RIGHT"/>
+									
+									<enumeration value="LOOK_LEFT"/>
+									<enumeration value="LOOK_RIGHT"/>
+									<enumeration value="LOOK_UP"/>
+									<enumeration value="LOOK_DOWN"/>
+									
+									<enumeration value="EARS_OUT"/>
+									<enumeration value="EPICANTHIC_FOLD"/>
+									
+									<enumeration value="EYE_SQUINT_LEFT"/>
+									<enumeration value="EYE_SQUINT_RIGHT"/>
+									
+									<enumeration value="NECK_PAN"/>
+									<enumeration value="NECK_TILT"/>
+		
+								</restriction>
+							</simpleType>
+						</attribute>
+					</complexType>
+				</element>
+			</sequence>
+			<attribute name="name" use="required" type="string" />
+		</complexType>
+	</element>
+
+</schema>

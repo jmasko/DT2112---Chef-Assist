@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="furhat-robot-head">Furhat robot head</h2>
+<p><img src="img/furhat.png" width="200" style="float:right"/></p>
+<p>IrisTK is closely integrated with the <a href="http://www.furhatrobotics.com">Furhat robot head</a>. Furhat supports speech synthesis, facial animation and neck movements, which all run on a separate on-board computer. Since IrisTK is designed to run in a <a href="distributed_systems.html">distributed fashion</a>, it is very easy to integrate Furhat into your system.</p>
+<p>There are two different modes in which you can run Furhat:</p>
+<ul>
+<li><strong>Passive mode</strong>: In this mode, Furhat only runs the facial animation and synthesis. By connecting to the Furhat computer from your own computer, you can control Furhat's gaze, speech and gestures.</li>
+<li><strong>Live mode</strong>: In this mode, Furhat also runs speech recognition, kinect and all modules necessary to be fully autonomous. You can upload you own <em>skills</em> to Furhat. A skill contains instructions on which grammars to load and a flow for the dialog.</li>
+</ul>
+<h3 id="using-furhat-in-your-iristk-dialogue-system">Using Furhat in your IrisTK dialogue system</h3>
+<p>If you already have a situated dialogue system running with the facial animation that comes with IrisTK, it is very easy to use Furhat instead of the animated agent. Check out <a href="tutorial_sitint.html">Tutorial 2</a> for instructions on how to use Furhat in either Passive mode (with the main system running on your own computer) or Live mode (uploading your application to the Furhat computer).</p>
+<h3 id="using-furhat-with-another-dialogue-system-from-java">Using Furhat with another dialogue system (from Java)</h3>
+<p>The Furhat robot head can also be controlled from a simple Java API, if you are not interested in the other features of IrisTK. This also does not require Windows. In this case, Furhat should run in Passive mode. You will need furhat-proxy.jar, which you can <a href="/download">download from here</a>.</p>
+<p><img src="img/furhat_coordinates.png" style="float:right;margin-left:10px"/></p>
+<p>Then you can control Furhat like this:</p>
+<pre class="sourceCode java"><code class="sourceCode java">FurhatProxy furhat = <span class="kw">new</span> <span class="fu">FurhatProxy</span>(FURHAT_ADDRESS);
+<span class="co">// Make Furhat say something</span>
+furhat.<span class="fu">say</span>(<span class="st">&quot;Hello there&quot;</span>);
+<span class="co">// Make Furhat make a gesture</span>
+furhat.<span class="fu">gesture</span>(<span class="st">&quot;smile&quot;</span>);
+<span class="co">// Make Furhat gaze in a certain direction</span>
+furhat.<span class="fu">gaze</span>(1f, 1f, 2f);
+<span class="co">// Make Furhat gaze using eyes only</span>
+furhat.<span class="fu">gaze</span>(1f, 1f, 2f, <span class="st">&quot;eyes&quot;</span>);</code></pre>
+<p>The target for Furhat's gaze are provided as a point in space with X, Y, Z (in meters) according the illustration on the right.</p>
+<h3 id="using-furhat-from-another-programming-language">Using Furhat from another programming language</h3>
+<p>If you want to control Furhat from another programming language, you can simply <a href="distributed_systems.html">connect to the Furhat broker using TCP/IP</a>. Use the ticket &quot;furhat&quot;. Again, you should use the Passive mode.</p>
+<p>You can then control Furhat by sending the following JSON instructions:</p>
+<pre class="sourceCode json"><code class="sourceCode json"><span class="er">//</span> <span class="er">Make</span> <span class="er">Furhat</span> <span class="er">say</span> <span class="er">something</span>
+<span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.speech&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;text&quot;</span> <span class="fu">:</span> <span class="st">&quot;Hello there&quot;</span>
+<span class="fu">}</span>
+<span class="er">//</span> <span class="er">Make</span> <span class="er">Furhat</span> <span class="er">perform</span> <span class="er">a</span> <span class="er">gesture</span>
+<span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.gesture&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;name&quot;</span> <span class="fu">:</span> <span class="st">&quot;smile&quot;</span>
+<span class="fu">}</span>
+<span class="er">//</span> <span class="er">Make</span> <span class="er">Furhat</span> <span class="er">gaze</span> <span class="er">in</span> <span class="er">a</span> <span class="er">certain</span> <span class="er">direction</span>
+<span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.gaze&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;location&quot;</span> <span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;x&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;y&quot;</span> <span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;z&quot;</span> <span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span>
+<span class="fu">}</span>
+<span class="er">//</span> <span class="er">Make</span> <span class="er">Furhat</span> <span class="er">gaze</span> <span class="er">using</span> <span class="er">eyes</span> <span class="er">only</span>
+<span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.gaze&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;location&quot;</span> <span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;x&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;y&quot;</span> <span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;z&quot;</span> <span class="fu">:</span> <span class="dv">2</span><span class="fu">},</span>
+  <span class="dt">&quot;mode&quot;</span> <span class="fu">:</span> <span class="st">&quot;eyes&quot;</span>
+<span class="fu">}</span></code></pre>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section class="active"><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li class="active"><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

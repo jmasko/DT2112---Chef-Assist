@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="standardized-events">Standardized Events</h2>
+<h3 id="general-event-parameters">General event parameters</h3>
+<p>Each event has the follow standard parameters:</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">event_name</td>
+<td align="left">String</td>
+<td align="left">The name of the event (such as &quot;action.speech&quot;)</td>
+</tr>
+<tr class="even">
+<td align="left">event_id</td>
+<td align="left">String</td>
+<td align="left">A unique ID for the event</td>
+</tr>
+<tr class="odd">
+<td align="left">event_sender</td>
+<td align="left">String</td>
+<td align="left">The name of the module that sent the event</td>
+</tr>
+<tr class="even">
+<td align="left">event_time</td>
+<td align="left">String</td>
+<td align="left">A timestamp when the event was created</td>
+</tr>
+</tbody>
+</table>
+<h3 id="system-related-events">System-related events</h3>
+<h4 id="monitor.system.start">monitor.system.start</h4>
+<p>Reported when the system has started (as issued by system.sendStartSignal()).</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">system</td>
+<td align="left">String</td>
+<td align="left">The name of the system</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.module.start">monitor.module.start</h4>
+<p>Reported by a module when it starts.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">system</td>
+<td align="left">String</td>
+<td align="left">The name of the system</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.module.state">monitor.module.state</h4>
+<p>Reported by a module when it changes state (for visualization and logging purposes)</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">states</td>
+<td align="left">List</td>
+<td align="left">A list of state names</td>
+</tr>
+</tbody>
+</table>
+<h3 id="speech-synthesis">Speech synthesis</h3>
+<h4 id="action.speech">action.speech</h4>
+<p>An action that can be sent to a synthesizer to add an utterance to the speech queue</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">text</td>
+<td align="left">String</td>
+<td align="left">The text to speak</td>
+</tr>
+<tr class="even">
+<td align="left">start</td>
+<td align="left">int</td>
+<td align="left">The number of milliseconds into the utterance that the synthesis should start</td>
+</tr>
+<tr class="odd">
+<td align="left">audio</td>
+<td align="left">String</td>
+<td align="left">An audio file to play instead of synthesizing</td>
+</tr>
+<tr class="even">
+<td align="left">display</td>
+<td align="left">String</td>
+<td align="left">A nicely formatted text representation for display purposes</td>
+</tr>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is associated with this synthesis. If this is omitted, all synthesizers should start</td>
+</tr>
+<tr class="even">
+<td align="left">ifsilent</td>
+<td align="left">Boolean</td>
+<td align="left">Only add utterance if the system is silent. Default is false.</td>
+</tr>
+<tr class="odd">
+<td align="left">abort</td>
+<td align="left">Boolean</td>
+<td align="left">Whether to abort the current speech queue. Default is false (i.e., append the utterance).</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.speech.stop">action.speech.stop</h4>
+<p>An action that can be sent to a synthesizer to stop speaking (and clearing the speech queue)</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis. If this is omitted, all synthesizers should stop</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.speech.start">monitor.speech.start</h4>
+<p>Monitors that a speech synthesizer has started an utterance</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+<tr class="even">
+<td align="left">text</td>
+<td align="left">String</td>
+<td align="left">Taken from action.speech</td>
+</tr>
+<tr class="odd">
+<td align="left">start</td>
+<td align="left">int</td>
+<td align="left">Taken from action.speech</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">Taken from action.speech</td>
+</tr>
+<tr class="odd">
+<td align="left">length</td>
+<td align="left">int</td>
+<td align="left">The length of the utterance (in msec)</td>
+</tr>
+<tr class="even">
+<td align="left">prominence</td>
+<td align="left">int</td>
+<td align="left">The position in the utterance (in msec) where the prominence is located</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.speech.end">monitor.speech.end</h4>
+<p>Monitors that a speech synthesizer has completed an utterance</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+<tr class="even">
+<td align="left">stopped</td>
+<td align="left">int</td>
+<td align="left">If the speech synthesis is stopped prematurely, this parameter reports the position in the utterance (in msec) where it stopped</td>
+</tr>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is associated with this synthesis</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.speech.done">monitor.speech.done</h4>
+<p>Monitors that a speech synthesizer has completed an utterance and the speech queue is empty</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is associated with this synthesis</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.speech.prominence">monitor.speech.prominence</h4>
+<p>Reported by the synthesizer when prominence in the utterance is detected. Can be useful when linked to facial gestures.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.voice">action.voice</h4>
+<p>An action that can be sent to a synthesizer to change the voice. Either name, lang or gender (or a combination thereof) must be provided.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">name</td>
+<td align="left">String</td>
+<td align="left">The name of the voice</td>
+</tr>
+<tr class="even">
+<td align="left">lang</td>
+<td align="left">String</td>
+<td align="left">The language code for the voice (such as &quot;en-US&quot;)</td>
+</tr>
+<tr class="odd">
+<td align="left">gender</td>
+<td align="left">String</td>
+<td align="left">The gender of the voice (&quot;male&quot; or &quot;female&quot;)</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is associated with this synthesis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="embodied-agents">Embodied agents</h3>
+<h4 id="action.lipsync">action.lipsync</h4>
+<p>An action sent from the speech synthesizer to the embodied agent if lipsync is turned on.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+<tr class="even">
+<td align="left">start</td>
+<td align="left">int</td>
+<td align="left">Taken from action.speech</td>
+</tr>
+<tr class="odd">
+<td align="left">phones</td>
+<td align="left">Transcription</td>
+<td align="left">The transcription (phones with timings)</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is associated with this synthesis</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.lipsync.stop">action.lipsync.stop</h4>
+<p>Stop the lipsync.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.lipsync.start">monitor.lipsync.start</h4>
+<p>Sent by an embodied agent to tell the synthesizer that lipsync has started. If lipsync is turned on, the synthesizer should not start until this has been received.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.speech event that started the speech synthesis</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.gesture">action.gesture</h4>
+<p>Makes the agent perform a specific gesture.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">name</td>
+<td align="left">String</td>
+<td align="left">The name of the gesture</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.gesture.start">monitor.gesture.start</h4>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+<tr class="even">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.gesture event that issued this gesture</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.gesture.end">monitor.gesture.end</h4>
+<p>Sent when the gesture ends</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+<tr class="even">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.gesture event that issued this gesture</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.gaze">action.gaze</h4>
+<p>Makes the agent shift gaze to a certain location in 3D space</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">location</td>
+<td align="left">Location</td>
+<td align="left">The 3D location where the agent should gaze</td>
+</tr>
+<tr class="even">
+<td align="left">mode</td>
+<td align="left">String</td>
+<td align="left">See below</td>
+</tr>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<p>The mode can be one of these:</p>
+<ul>
+<li><strong>default</strong>: Uses eyes and neck in a flexible way</li>
+<li><strong>eyes</strong>: Uses eyes only, hold the neck still</li>
+<li><strong>headpose</strong>: Center the eyes and use the neck</li>
+</ul>
+<h4 id="monitor.gaze">monitor.gaze</h4>
+<p>Sent when the gaze is shifted</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.gaze event that issued this gaze shift</td>
+</tr>
+<tr class="even">
+<td align="left">location</td>
+<td align="left">Location</td>
+<td align="left">The resulting gaze target location</td>
+</tr>
+<tr class="odd">
+<td align="left">head:rotation</td>
+<td align="left">Rotation</td>
+<td align="left">The resulting head rotation</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.face.texture">action.face.texture</h4>
+<p>Makes the agent change the texture of the face.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">name</td>
+<td align="left">String</td>
+<td align="left">The name of the texture</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="speech-recognition">Speech recognition</h3>
+<h4 id="action.listen">action.listen</h4>
+<p>An action that can be sent to a recognizer to make it start listening.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">context</td>
+<td align="left">String</td>
+<td align="left">A name filter with the contexts to use. If omitted, the default context is used (as set with action.context.default).</td>
+</tr>
+<tr class="even">
+<td align="left">endSilTimeout</td>
+<td align="left">int</td>
+<td align="left">The silence timeout (in msec) to detect end-of-speech</td>
+</tr>
+<tr class="odd">
+<td align="left">noSpeechTimeout</td>
+<td align="left">int</td>
+<td align="left">The silence timout (in msec) if no speech is detected</td>
+</tr>
+<tr class="even">
+<td align="left">maxSpeechTimeout</td>
+<td align="left">int</td>
+<td align="left">The maximum length of the speech (in msec)</td>
+</tr>
+<tr class="odd">
+<td align="left">nbest</td>
+<td align="left">int</td>
+<td align="left">The maximum number of hypotheses to generate</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.listen.stop">action.listen.stop</h4>
+<p>An action that can be sent to a recognizer to make it stop listening.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that started the speech recognizer. If this is omitted, all recognizers should stop</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.listen.start">monitor.listen.start</h4>
+<p>Reported by each RecognizerModule when it starts listening</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that issued this recognition</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the recognizer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.context.load">action.context.load</h4>
+<p>Makes each RecognizerModule load a context (such as a grammar or semantic interpreter).</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">context</td>
+<td align="left">Context</td>
+<td align="left">The context to load</td>
+</tr>
+</tbody>
+</table>
+<h4 id="monitor.context.load">monitor.context.load</h4>
+<p>Sent when a context is loaded.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">success</td>
+<td align="left">Boolean</td>
+<td align="left">Whether loading the context succeeded</td>
+</tr>
+<tr class="even">
+<td align="left">message</td>
+<td align="left">String</td>
+<td align="left">An error message in case the loading failed</td>
+</tr>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.context.load event</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.context.default">action.context.default</h4>
+<p>Sets the default context to be used by each RecognizerModule. This is the context that is used if no context is provided in the action.listen event.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">context</td>
+<td align="left">String</td>
+<td align="left">A name filter with the contexts to use as default</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.speech.start">sense.speech.start</h4>
+<p>Sent by the recognizer when it has detected start-of-speech.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that issued this recognition</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the recognizer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.speech.end">sense.speech.end</h4>
+<p>Sent by the recognizer when it has detected end-of-speech.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that issued this recognition</td>
+</tr>
+<tr class="even">
+<td align="left">length</td>
+<td align="left">int</td>
+<td align="left">The length of the utterance (in msec)</td>
+</tr>
+<tr class="odd">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the recognizer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.speech.rec">sense.speech.rec</h4>
+<p>Once the recognition is done, one event that matches sense.speech.rec** is reported. See the different variants below.</p>
+<p>If speech recognition is successful, sense.speech.rec will be generated (without suffix). Note that this includes cases where no grammar matched the recogniton, in which case the &quot;text&quot; parameter will be set to &quot;&lt;NOMATCH&gt;&quot;.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">text</td>
+<td align="left">String</td>
+<td align="left">The result in text</td>
+</tr>
+<tr class="even">
+<td align="left">length</td>
+<td align="left">int</td>
+<td align="left">The length of the utterance (in msec)</td>
+</tr>
+<tr class="odd">
+<td align="left">sem</td>
+<td align="left">Record</td>
+<td align="left">The semantic interpretation</td>
+</tr>
+<tr class="even">
+<td align="left">conf</td>
+<td align="left">float</td>
+<td align="left">Confidence score (from 0.0 to 1.0)</td>
+</tr>
+<tr class="odd">
+<td align="left">words</td>
+<td align="left">List</td>
+<td align="left">A list of records containing the individual words</td>
+</tr>
+<tr class="even">
+<td align="left">nbest</td>
+<td align="left">List</td>
+<td align="left">An n-best list of hypotheses (each a Record containing the attributes in this table)</td>
+</tr>
+<tr class="odd">
+<td align="left">context</td>
+<td align="left">String</td>
+<td align="left">The name of the context that matched</td>
+</tr>
+<tr class="even">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that issued this recognition</td>
+</tr>
+<tr class="odd">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the recognizer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.speech.rec.silence">sense.speech.rec.silence</h4>
+<p>Reported if no speech was detected and the noSpeechTimeout has been reached.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">action</td>
+<td align="left">String</td>
+<td align="left">The ID of the action.listen event that issued this recognition</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the recognizer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.speech.rec.maxspeech">sense.speech.rec.maxspeech</h4>
+<p>Reported if the user's utterance is too long, and the maxSpeechTimeout has been reached.</p>
+<p>Parameters are the same as for sense.speech.rec.silence.</p>
+<h4 id="sense.speech.rec.failed">sense.speech.rec.failed</h4>
+<p>Reported if the speech recognition failed due to a technical problem.</p>
+<p>Parameters are the same as for sense.speech.rec.silence.</p>
+<h4 id="sense.speech.partial">sense.speech.partial</h4>
+<p>Partial speech recognition result that is reported several times during recognition, if partial results is turned on.</p>
+<p>Parameters are the same as for sense.speech.rec.</p>
+<h3 id="vision">Vision</h3>
+<h4 id="sense.body">sense.body</h4>
+<p>Reported when a camera (or another device) senses bodies</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">bodies</td>
+<td align="left">Record</td>
+<td align="left">A record with all bodies (with body ID:s as keys and Body objects as values)</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the camera or sensor that detected the bodies</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.item">sense.item</h4>
+<p>Reported when an item is detected or moved, such as an object that can be referred to during the interaction.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">items</td>
+<td align="left">Record</td>
+<td align="left">A record with all items (with item ID:s as keys and Item objects as values)</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">The ID of the camera or sensor that detected the items</td>
+</tr>
+</tbody>
+</table>
+<h3 id="situated-interaction">Situated interaction</h3>
+<h4 id="action.situation.detect">action.situation.detect</h4>
+<p>An action to retrieve information about the situation, i.e. cause all situation-aware modules to send sense.situation events.</p>
+<h4 id="sense.situation">sense.situation</h4>
+<p>Sent by each situation-aware module when it starts, or when action.situation.detect is issued. The event either contains sensors or system agents.</p>
+<p>Each parameter contains either a Sensor or SystemAgent record. The name of each parameter corresponds to the ID of the Sensor or SystemAgent.</p>
+<h4 id="action.attend">action.attend</h4>
+<p>An action to attend to a specific target, picked up by SystemAgentFlow. Either target or location must be provided.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">target</td>
+<td align="left">String</td>
+<td align="left">The ID of a user or item that is to be attended (or &quot;nobody&quot; if nobody is to be attended)</td>
+</tr>
+<tr class="even">
+<td align="left">location</td>
+<td align="left">Location</td>
+<td align="left">A location in 3D space to attend to</td>
+</tr>
+<tr class="odd">
+<td align="left">mode</td>
+<td align="left">String</td>
+<td align="left">See action.gaze above</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.attend.all">action.attend.all</h4>
+<p>An action to attend to all users, picked up by SystemAgentFlow.</p>
+<h4 id="action.attend.asleep">action.attend.asleep</h4>
+<p>An action to make the agent fall asleep, picked up by SystemAgentFlow.</p>
+<h4 id="monitor.attend">monitor.attend</h4>
+<p>Reported when the agent's attention changes, sent by SystemAgentFlow.</p>
+<h4 id="sense.user.enter">sense.user.enter</h4>
+<p>Reported by SystemAgentModule when a user enters the interaction space of the system agent.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">head:location</td>
+<td align="left">Location</td>
+<td align="left">The location of the user's head in absolute space</td>
+</tr>
+<tr class="odd">
+<td align="left">head:rotation</td>
+<td align="left">Rotation</td>
+<td align="left">The rotation of the user's head in absolute space</td>
+</tr>
+<tr class="even">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">An ID on the form &quot;SID-BID&quot;, where SID is the ID of the camera sensor, and BID is the ID of the body reported by the camera sensor</td>
+</tr>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.leave">sense.user.leave</h4>
+<p>Reported by SystemAgentModule when a user leaves the interaction space of the system agent.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.move">sense.user.move</h4>
+<p>Reported by SystemAgentModule when one or more users move.</p>
+<p>Each user is represented as a record under a parameter that is the user agent ID. Each such user record has the same parameters as sense.user.enter.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.attend">sense.user.attend</h4>
+<p>Reported by SystemAgentModule when a user's attention shifts.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">target</td>
+<td align="left">String</td>
+<td align="left">The ID of the agent that is being attended</td>
+</tr>
+<tr class="odd">
+<td align="left">sensor</td>
+<td align="left">String</td>
+<td align="left">See sense.user.enter</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.item.move">sense.item.move</h4>
+<p>Items relevant to the system agent have been moved.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+<tr class="even">
+<td align="left">items</td>
+<td align="left">Record</td>
+<td align="left">All items that have moved, with the ID of each item as keys</td>
+</tr>
+<tr class="odd">
+<td align="left">prominent</td>
+<td align="left">String</td>
+<td align="left">The ID of the items that was moved most</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.speak">sense.user.speak</h4>
+<p>This is a higher-level event that is produced by the SystemAgentFlow. It corresponds to sense.speech.rec. However, even if there several recognizers, only one sense.user.speak event will be generated. Thus, it is very useful for handling multi-party interaction.</p>
+<p>The action.listen will result in either</p>
+<ul>
+<li>sense.user.speak</li>
+<li>sense.user.silence</li>
+<li>sense.user.speak.side (only for multi-party interaction)</li>
+<li>sense.user.speak.multi (only for multi-party interaction)</li>
+</ul>
+<p>The parameters are the same as sense.speech.rec above, with the addition of:</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">attsys</td>
+<td align="left">boolean</td>
+<td align="left">Whether or not the user was attending the system during the utterance</td>
+</tr>
+<tr class="odd">
+<td align="left">all</td>
+<td align="left">List</td>
+<td align="left">If several users were speaking, all events will be placed here, each with the same parameters as sense.speech.rec above.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.speak.side">sense.user.speak.side</h4>
+<p>Reported if one of the users was attended to by the system, and some other user answered.</p>
+<p>The parameters are the same as for sense.user.speak.</p>
+<h4 id="sense.user.speak.multi">sense.user.speak.multi</h4>
+<p>Reported if the system was attending all users and several users replied while attending the system, or if no user attended the system, but several of them replied. If only one user replied, or if only one user replied while attending the system, sense.user.speak is generated instead.</p>
+<p>The parameters are the same as for sense.user.speak, with the speech data from the different users merged. The separate speech events can be accessed by the parameter &quot;all&quot;.</p>
+<h4 id="sense.user.silence">sense.user.silence</h4>
+<p>Reported if no user replied and the end-of-speech silence threshold was reached.</p>
+<h4 id="sense.user.speech.start">sense.user.speech.start</h4>
+<p>Reported at the start of speech for each user. Corresponds to sense.speech.start, but with the user identified.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">speakers</td>
+<td align="left">int</td>
+<td align="left">The numbers of simultaneous speakers (1 when the first user has started speaking)</td>
+</tr>
+<tr class="odd">
+<td align="left">attsys</td>
+<td align="left">boolean</td>
+<td align="left">Whether or not the user was attending the system at the start of the utterance</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sense.user.speech.end">sense.user.speech.end</h4>
+<p>Reported at the end of speech for each user. Corresponds to sense.speech.end, but with the user identified.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">user</td>
+<td align="left">String</td>
+<td align="left">The ID of the user agent</td>
+</tr>
+<tr class="even">
+<td align="left">speakers</td>
+<td align="left">int</td>
+<td align="left">The numbers of simultaneous speakers (0 when the last user has stopped speaking)</td>
+</tr>
+<tr class="odd">
+<td align="left">attsys</td>
+<td align="left">boolean</td>
+<td align="left">Whether or not the user was attending the system during the utterance</td>
+</tr>
+<tr class="even">
+<td align="left">agent</td>
+<td align="left">String</td>
+<td align="left">The ID of the system agent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="logging">Logging</h3>
+<h4 id="action.logging.start">action.logging.start</h4>
+<p>Triggers the LoggingModule to start logging.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">timestamp</td>
+<td align="left">String</td>
+<td align="left">A timestamp to use when naming the log files. Can be omitted, in which case System.currentTimeMillis() will be used as a name.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="action.logging.stop">action.logging.stop</h4>
+<p>Triggers the LoggingModule to stop logging.</p>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section class="active"><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li class="active"><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

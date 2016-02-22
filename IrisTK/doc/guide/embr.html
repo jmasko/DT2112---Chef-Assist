@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="embr-animated-agent">EMBR Animated agent</h2>
+<p>This add-on adds support the for the <a href="http://embots.dfki.de/EMBR/">EMBR animated agent system</a> developed at DFKI. The system must be installed and run before running your IrisTK application. The IrisTK EMBR module then communicates with the animation engine through a socket.</p>
+<p>The full body animation is not used yet, so you can zoom in on the agent's head by dragging with the left (move) and right (zoom) mouse button. Make it look something like this:</p>
+<div class="figure">
+<img src="img/embr.png" />
+
+</div>
+<h3 id="usage">Usage</h3>
+<p>To use EMBR in IrisTK, add the EMBRModule to the system:</p>
+<pre class="sourceCode java"><code class="sourceCode java">system.<span class="fu">addModule</span>(<span class="kw">new</span> <span class="fu">EMBRModule</span>());</code></pre>
+<p>You must also enable lipsync for the synthesizer module:</p>
+<pre class="sourceCode java"><code class="sourceCode java">SynthesizerModule synth = <span class="kw">new</span> <span class="fu">SynthesizerModule</span>(
+                              <span class="kw">new</span> <span class="fu">WindowsSynthesizer</span>(Gender.<span class="fu">FEMALE</span>));
+synth.<span class="fu">doLipsync</span>(<span class="kw">true</span>);
+system.<span class="fu">addModule</span>(synth);</code></pre>
+<p>To control the gaze and gestures of the animated agent with events, see the <a href="events.html">Events</a> section.</p>
+<p>The following gestures are supported:</p>
+<ul>
+<li>brow_raise</li>
+<li>smile</li>
+<li>smile_open</li>
+<li>anger</li>
+<li>disgust</li>
+<li>fear</li>
+<li>sad</li>
+<li>surprise</li>
+<li>nod_head</li>
+<li>shake_head</li>
+</ul>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

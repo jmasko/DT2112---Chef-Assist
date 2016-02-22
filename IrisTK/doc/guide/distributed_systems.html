@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="distributed-systems">Distributed systems</h2>
+<p>It is possible to distribute the system over different processes and/or computers, using serialized communication over TCP/IP. This also makes it possible to write modules in other programming languages than Java.</p>
+<p>First, you need to start a Broker that relays all messages. Thus, all systems only need to know the address of the Broker and inform the Broker of which events they subscribe to. The Broker can be started from the command like like this:</p>
+<pre><code>iristk broker [port]</code></pre>
+<p>The port is optional and is assigned to 1932 in the default case. Then, it is possible to connect the IrisSystem to the broker like this:</p>
+<pre class="sourceCode java"><code class="sourceCode java">irisSystem.<span class="fu">connectToBroker</span>(<span class="st">&quot;myticket&quot;</span>, <span class="st">&quot;127.0.0.1&quot;</span>, <span class="dv">1932</span>);</code></pre>
+<p>All systems (running in different processes or on different machines) that connect to the broker like this and share the same ticket (&quot;myticket&quot; in this case) will automatically share events.</p>
+<p>By default, all modules subscribe to all events. This is typically not a problem when everything runs in the same process and only pointers are passed around. However, when using a broker, serialization and network messaging might be inefficient if too many events are passed around. If you want to restrict which events are relayed by the broker, you have to make sure that the modules only subscribe to messages they are interested in by using the subscribe() method in the IrisModule, like this (check the javadoc for iristk.util.NameFilter for how to write filters):</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="fu">subscribe</span>(<span class="st">&quot;action.listen**&quot;</span>);</code></pre>
+<h3 id="connecting-from-another-programming-language">Connecting from another programming language</h3>
+<p>If you want to communicate with the IrisBroker from another programming language, you have to follow the broker protocol.</p>
+<ol style="list-style-type: decimal">
+<li>Connect to the broker using a socket on the right port. Create two threads, one for writing to the socket and one for reading from it.</li>
+<li>Write &quot;CONNECT [ticket]\n&quot; on the socket, where [ticket] is the name of the ticket you want to share events with.</li>
+<li>Read on the socket and wait for &quot;CONNECTED\n&quot;.</li>
+<li>Write &quot;SUBSCRIBE [filter]\n&quot; to tell the broker which events you are interested in (e.g., &quot;**&quot; for all events).</li>
+<li>Accept messages from the broker:
+<ul>
+<li>&quot;SUBSCRIBE [filter]\n&quot;, which informs you on what events the other clients connected to the broker are interested in. This might be updated over time. Initially, you could of course ignore this and send everything to the broker that you know is important.</li>
+<li>&quot;EVENT [name] [nBytes]\n&quot; followed by a serialized event in JSON format. The [nBytes] is a number which tells you how many bytes the JSON event takes. Thus, you have to continue to read these bytes and then parse the JSON.</li>
+<li>&quot;CLOSE\n&quot; when the broker wants to shut you off</li>
+</ul></li>
+<li>Send events to the broker by writing to the socket: &quot;EVENT [name] [nBytes]\n&quot;, followed by the serialized JSON event, where [nBytes] denotes the number of bytes in the JSON event.</li>
+<li>Shut down the connection nicely by writing &quot;CLOSE\n&quot; when you want to terminate your client.</li>
+</ol>
+<h3 id="event-json-format">Event JSON format</h3>
+<p>The events are serialized into JSON like this:</p>
+<pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.speech&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;text&quot;</span> <span class="fu">:</span> <span class="st">&quot;Hello there&quot;</span>
+<span class="fu">}</span>
+
+<span class="fu">{</span>
+  <span class="dt">&quot;class&quot;</span> <span class="fu">:</span> <span class="st">&quot;iristk.system.Event&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;event_name&quot;</span> <span class="fu">:</span> <span class="st">&quot;action.listen&quot;</span><span class="fu">,</span>
+  <span class="dt">&quot;timeout&quot;</span> <span class="fu">:</span> <span class="dv">4000</span>
+<span class="fu">}</span></code></pre>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section class="active"><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li class="active"><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

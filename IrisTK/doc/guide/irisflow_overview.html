@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="irisflow-overview">IrisFlow overview</h2>
+<p>IrisTK provides a statechart-based framework for defining the flow of the interaction called IrisFlow. Statecharts are similar to finite state machines (FSM), but they are more flexible:</p>
+<ul>
+<li>States can be hierarchically structured; allowing the designer to define generic event handlers (i.e., transitions) on one level and more specific event handlers in the sub-states. In IrisFlow, this is accomplished by allowing states to extend other states (like a class extends another class in Java) and thereby adopt its parent's event handlers.</li>
+<li>It is possible to define flow variables which affect the execution.</li>
+<li>Transitions may not only be triggered by events, but they may also have guard conditions that checks the event parameters as well as the state of the flow variables.</li>
+<li>Apart from ordinary state transitions IrisFlow also allows states to be called, blocking the current execution, after which the called state might return, and the execution continues.</li>
+</ul>
+<p>The flow is defined using XML and then compiled to Java source code. For instructions on how to compile the flow, refer to <a href="creating_an_app.html">this tutorial</a>.</p>
+<p>Here is an abstract view of the general structure of the flow XML:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;flow</span><span class="ot"> name=</span><span class="st">&quot;FLOW_NAME&quot;</span><span class="ot"> package=</span><span class="st">&quot;FLOW_PACKAGE&quot;</span><span class="ot"> initial=</span><span class="st">&quot;INITIAL_STATE_ID&quot;</span><span class="kw">&gt;</span>
+    
+    <span class="co">&lt;!-- Zero or more flow-level parameters --&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;VAR_NAME&quot;</span><span class="ot"> type=</span><span class="st">&quot;VAR_TYPE&quot;</span><span class="kw">/&gt;</span>
+    
+    <span class="co">&lt;!-- Zero or more flow-level variables --&gt;</span>
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;VAR_NAME&quot;</span><span class="ot"> type=</span><span class="st">&quot;VAR_TYPE&quot;</span><span class="kw">/&gt;</span>
+    
+    <span class="co">&lt;!-- One or more states --&gt;</span>
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;STATE_ID&quot;</span><span class="kw">&gt;</span>
+        <span class="co">&lt;!-- Zero or more state-level parameters --&gt;</span>
+        <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;PARAM_NAME&quot;</span><span class="ot"> type=</span><span class="st">&quot;PARAM_TYPE&quot;</span><span class="kw">/&gt;</span>
+        <span class="co">&lt;!-- Zero or more state-level variables --&gt;</span>
+        <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;VAR_NAME&quot;</span><span class="ot"> type=</span><span class="st">&quot;VAR_TYPE&quot;</span><span class="kw">/&gt;</span>
+        <span class="co">&lt;!-- Zero or one onentry event handler --&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="co">&lt;!-- actions to execute when the state is entered --&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="co">&lt;!-- Zero or more onevent event handler --&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;EVENT_NAME&quot;</span><span class="ot"> cond=</span><span class="st">&quot;CONDITIONS&quot;</span><span class="kw">&gt;</span>
+            <span class="co">&lt;!-- actions to execute when the event is received --&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="co">&lt;!-- Zero or one onenxit event handler --&gt;</span>
+        <span class="kw">&lt;onexit&gt;</span>
+            <span class="co">&lt;!-- actions to execute when the state is exited --&gt;</span>
+        <span class="kw">&lt;/onexit&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+
+<span class="kw">&lt;/flow&gt;</span></code></pre>
+<p>As can be seen, the flow basically contains a number of global variables and states. The flow is always in one particular state, but can change state through either &lt;call&gt; or &lt;goto&gt;, as described further down. Each state can be thought of as a collection of event handlers, which in turn contain actions. As can be seen, it is also possible to add parameters &lt;param&gt; to the state, as well as local variables &lt;var&gt;. Note that unlike flow-level variables, which are created when the flow is initialized and live through the whole flow execution, state variables are forgotten once the state is left and re-created if the state is reached again.</p>
+<p>When running the flow, the flow module starts by checking its event queue and then goes through the event handlers for the current state in order to see if any of them matches. If so, the actions for that event handler are taken (which could include transitions to other states or the raising of new events). Once all actions are taken, the event queue is checked again for new events (so called run-to-completion). Once an event handler consumes an event, it will not be checked against event handlers further down the list (unless a &lt;propagate&gt; action is issued by the consuming event handler). If no event handler consumes the event, the flow module checks the next event in the event queue. If there are no more events, the FlowModule blocks and waits for events to arrive.</p>
+<p>The events in the FlowModule can either be local or global events. All events that are relayed to the FlowModule by IrisSystem (i.e., all events that are produced by all modules in the default case) end up as global events in the FlowModule event queue and can thus be reacted upon. The flow itself may also raise both global events (using the &lt;send&gt; action) and local events (using the &lt;raise&gt; action). Global event are sent to the IrisSystem and relayed to other modules, whereas local events are only put on the flow's own event queue.</p>
+<h3 id="state-transitions">State transitions</h3>
+<p>There are two types of state transitions: &lt;call&gt; and &lt;goto&gt;. When a &lt;goto&gt; is issued, the current execution is aborted. However, it is also possible to just &lt;call&gt; another state (similar to calling a function in any programming language) as part of an execution and then continue the execution when the called state issues a &lt;return&gt;. The following example shows how to call a state twice, making the system say two utterances after each other. The Speaking state issues a command to the speech synthesizer to speak and then waits for the end-of-speech before returning. As can be seen, by using parameters, this creates a powerful means for creating reusable states and issuing complex actions with short statements.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Test&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;call</span><span class="ot"> state=</span><span class="st">&quot;Speaking&quot;</span><span class="ot"> p:text=</span><span class="st">&quot;&#39;This is the first part&#39;&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;call</span><span class="ot"> state=</span><span class="st">&quot;Speaking&quot;</span><span class="ot"> p:text=</span><span class="st">&quot;&#39;And this is the second part&#39;&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.leave&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Idle&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+<span class="kw">&lt;state&gt;</span>
+
+<span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Speaking&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;text&quot;</span><span class="ot"> type=</span><span class="st">&quot;String&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;send</span><span class="ot"> event=</span><span class="st">&quot;action.speech&quot;</span><span class="ot"> p:text=</span><span class="st">&quot;text&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;monitor.speech.end&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;return/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onexit&gt;</span>
+        <span class="kw">&lt;send</span><span class="ot"> event=</span><span class="st">&quot;action.speech.stop&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onexit&gt;</span>
+<span class="kw">&lt;/state&gt;</span></code></pre>
+<p>One important aspect of calling states is that the event handlers of the calling state are still active when in the called state. Thus, when in the Speaking state in the example above, the event handlers of that state are first checked when events arrive, but if none of these trigger, the event handlers in the Test state will also be checked. Thus, if a sense.leave event is received while the system is speaking (i.e., while the system is still in the Speaking state), this will immediately result in a transition to the Idle state. Note also that there is an <onExit> handler in the Speaking state that will be triggered in that case, causing the system to stop speaking.</p>
+<p>To help you understand the workings of &lt;call&gt; and &lt;goto&gt; when combined with extended states, we will give you a schematic example. The picture below shows a visual representation of a statechart. Boxes represent states. The numbers assigned to the arrows indicate a possible sequence of transitions. The boxing of the states illustrates the hierarchical structure. Thus, State B and C are extensions to state A - if an event is received when in state B, first all event handlers in state B are checked, then the event handlers in state A. As can be seen, transition (2) and (3) are of the type call and (4) and (5) are returns to the calling states. When state E is called a second time (7), an event triggers an event handler in the super-state D, which issues a goto (8) to state B. Unlike the case for call, the goto transition automatically clears the call stack, which means that there will be no return to the calling state H in this case.</p>
+<p>As described above, when in a called state, events are not only checked against the event handlers of the current state and its super-states, but also the event handlers of the calling states. Thus, when an event is processed when in state F, the event handlers of the following states will be checked (in order): F, E, D, C, A.</p>
+<div class="figure">
+<img src="img/transitions.png" />
+
+</div>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section class="active"><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li class="active"><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>

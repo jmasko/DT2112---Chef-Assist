@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" > 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IrisTK</title>
+  <link rel="stylesheet" href="css/foundation.css">
+  <link rel="stylesheet" href="css/pandoc.css">
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h1><a href="index.html">IrisTK</a></h1>
+			<p class="tagline">Java-based dialogue system framework</p>
+			<hr/>
+		</div>
+	</div>
+
+	<div class="row">
+	
+		<div class="large-8 columns">
+			<h2 id="tutorial-3-semantics-and-dialog">Tutorial 3: Semantics and Dialog</h2>
+<p>In the previous tutorials, the dialog was very simple, and the utterances contained barely any semantics (just simple numbers). In this tutorial, we will look at more complex grammars, semantics and dialog. More specifically, you will learn the following things:</p>
+<ul>
+<li>How to create semantic interpretations with deeper and more complex structures</li>
+<li>How to use an open vocabulary recognizer together with a semantic grammar</li>
+<li>How to write more complex flows, that work in a slot-filling fashion</li>
+<li>How to extend this to multi-party dialog, allowing two users to fill out different forms</li>
+</ul>
+<p>Note: The first part of this tutorial only assumes that you have taken <a href="tutorial_first_app.html">Tutorial 1</a>, and know how to create a new application. The last part also assumes that you have taken <a href="tutorial_sitint.html">Tutorial 2</a> on situated interaction.</p>
+<h3 id="the-burger-dialog-system">The Burger dialog system</h3>
+<p>Our example application will be a dialog system that we can imagine being used in a hamburger store to receive orders.</p>
+<p>We will start by using the simple_dialog template. Create an application called &quot;burger&quot; and import it into Eclipse:</p>
+<pre><code>iristk create simple_dialog burger
+iristk eclipse</code></pre>
+<h3 id="speech-and-semantics">Speech and semantics</h3>
+<p>To start with, we will create a grammar for the application. Replace the contents of BurgerGrammar.xml with this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;grammar</span><span class="ot"> xml:lang=</span><span class="st">&quot;en-US&quot;</span><span class="ot"> version=</span><span class="st">&quot;1.0&quot;</span><span class="ot"> root=</span><span class="st">&quot;root&quot;</span>
+<span class="ot">    xmlns=</span><span class="st">&quot;http://www.w3.org/2001/06/grammar&quot;</span><span class="ot"> xmlns:xsi=</span><span class="st">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="ot">    xsi:schemaLocation=</span><span class="st">&quot;http://www.w3.org/2001/06/grammar http://www.iristk.net/xml/srgs.xsd&quot;</span>
+<span class="ot">    tag-format=</span><span class="st">&quot;semantics/1.0&quot;</span><span class="kw">&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;root&quot;</span><span class="ot"> scope=</span><span class="st">&quot;public&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;one-of&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i would like<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i would like to order<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i would like to have<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i want<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i want to order<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>i want to have<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>could i have<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#yes&quot;</span><span class="kw">/&gt;&lt;/item&gt;</span>
+                    <span class="kw">&lt;/one-of&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#order&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;tag&gt;</span>out.order = rules.order<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>please<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#yes&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;tag&gt;</span>out.yes=1<span class="kw">&lt;/tag&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#no&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;tag&gt;</span>out.no=1<span class="kw">&lt;/tag&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#flavor&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;tag&gt;</span>out.flavor = rules.flavor<span class="kw">&lt;/tag&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;order&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;1-3&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;one-of&gt;</span>
+                <span class="kw">&lt;item&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#main&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.main = rules.main<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;item&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#drink&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.drink = rules.drink<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;item&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#side&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.side = rules.side<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;/one-of&gt;</span>
+            <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>and<span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/item&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;main&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#count&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.count = rules.count<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#size&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.size = rules.size<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;one-of&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>
+                        <span class="kw">&lt;one-of&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>burger<span class="kw">&lt;/item&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>hamburger<span class="kw">&lt;/item&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>hamburgers<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;/one-of&gt;</span>
+                        <span class="kw">&lt;tag&gt;</span>out.type=&quot;hamburger&quot;<span class="kw">&lt;/tag&gt;</span>
+                    <span class="kw">&lt;/item&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>
+                        <span class="kw">&lt;one-of&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>cheeseburger<span class="kw">&lt;/item&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>cheeseburgers<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;/one-of&gt;</span>
+                        <span class="kw">&lt;tag&gt;</span>out.type=&quot;hamburger&quot;; out.topping=&quot;cheese&quot;<span class="kw">&lt;/tag&gt;</span>
+                    <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;/one-of&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;drink&quot;</span><span class="ot"> scope=</span><span class="st">&quot;public&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#count&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.count = rules.count<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#size&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.size = rules.size<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;one-of&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>
+                        <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                            <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#flavor&quot;</span><span class="kw">/&gt;</span>
+                            <span class="kw">&lt;tag&gt;</span>out.flavor = rules.flavor<span class="kw">&lt;/tag&gt;</span>
+                        <span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;item&gt;</span>milkshake<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;tag&gt;</span>out.type=&quot;milkshake&quot;<span class="kw">&lt;/tag&gt;</span>
+                    <span class="kw">&lt;/item&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>coke<span class="kw">&lt;tag&gt;</span>out.type=&quot;coke&quot;<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>sprite<span class="kw">&lt;tag&gt;</span>out.type=&quot;sprite&quot;<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>fanta<span class="kw">&lt;tag&gt;</span>out.type=&quot;fanta&quot;<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+                <span class="kw">&lt;/one-of&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;side&quot;</span><span class="ot"> scope=</span><span class="st">&quot;public&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#count&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.count = rules.count<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;item</span><span class="ot"> repeat=</span><span class="st">&quot;0-1&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;ruleref</span><span class="ot"> uri=</span><span class="st">&quot;#size&quot;</span> <span class="kw">/&gt;</span>
+                    <span class="kw">&lt;tag&gt;</span>out.size = rules.size<span class="kw">&lt;/tag&gt;</span>
+                <span class="kw">&lt;/item&gt;</span>
+                <span class="kw">&lt;one-of&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>
+                        <span class="kw">&lt;one-of&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>fries<span class="kw">&lt;/item&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>some fries<span class="kw">&lt;/item&gt;</span>
+                            <span class="kw">&lt;item&gt;</span>bag of fries<span class="kw">&lt;/item&gt;</span>
+                        <span class="kw">&lt;/one-of&gt;</span>
+                        <span class="kw">&lt;tag&gt;</span>out.type=&quot;fries&quot;<span class="kw">&lt;/tag&gt;</span>
+                    <span class="kw">&lt;/item&gt;</span>
+                    <span class="kw">&lt;item&gt;</span>sallad<span class="kw">&lt;tag&gt;</span>out.type=&quot;sallad&quot;<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+                <span class="kw">&lt;/one-of&gt;</span>
+            <span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;flavor&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>strawberry<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>chocolate<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>banana<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>vanilla<span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;size&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>large<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>medium<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>small<span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>           
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;count&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>a<span class="kw">&lt;tag&gt;</span>out=1<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>one<span class="kw">&lt;tag&gt;</span>out=1<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>two<span class="kw">&lt;tag&gt;</span>out=2<span class="kw">&lt;/tag&gt;&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+    
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;yes&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>yes<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>yes I do<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>sure<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>yeah<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>of course<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>okay<span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+    <span class="kw">&lt;rule</span><span class="ot"> id=</span><span class="st">&quot;no&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;one-of&gt;</span>
+            <span class="kw">&lt;item&gt;</span>no<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>no way<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>nope<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>not really<span class="kw">&lt;/item&gt;</span>
+            <span class="kw">&lt;item&gt;</span>I don&#39;t think so<span class="kw">&lt;/item&gt;</span>
+        <span class="kw">&lt;/one-of&gt;</span>
+    <span class="kw">&lt;/rule&gt;</span>
+
+<span class="kw">&lt;/grammar&gt;</span></code></pre>
+<p>We will now introduce a useful tool called TestRecognizer for experimenting with grammars and speech recognition. Start the tool like this:</p>
+<pre><code>iristk asr</code></pre>
+<div class="figure">
+<img src="img/asr_tool.jpg" />
+
+</div>
+<p>On the top left, you can choose a recognizer to test. Choose WindowsRecognizer. Below, you can see two grammar windows: a Speech Grammar and a Semantic Grammar. We will explain in the next section what the difference is, but we will start with the speech grammar. Either you can copy and paste the BurgerGrammar.xml into the window, or you can drag-and-drop the file from Eclipse. If you choose the latter, you can then save any changes you make directly from the tool. In order to use the grammar, we must load it into the recognizer. Press the Load button to do so. It is important to remember that you have to do this every time you change the grammar for the changes to take effect. If everything works fine, you will see a positive message in the Output window on the upper right, otherwise you will get an error message (for example if the grammar is ill-formed).</p>
+<p>When you have loaded the grammar, you can test the recognizer by pressing the Listen button (have your microphone ready). If you say &quot;I would like a cheese burger and a large coke&quot;, the resulting semantics (shown in the Output window) should look like this:</p>
+<pre><code>{order: 
+ {drink: 
+   {count: 1
+    type: coke
+    size: large}
+  main: 
+   {count: 1
+    topping: cheese
+    type: hamburger}}}</code></pre>
+<p>Examine the grammar and try to understand what it allows. Remember that the Speech Grammar must match exactly what you say. You could for example try:</p>
+<ul>
+<li>&quot;I would like to order a strawberry milkshake please&quot;</li>
+<li>&quot;I want to have two large hamburgers and a sallad&quot;</li>
+<li>&quot;a small hamburger&quot;</li>
+<li>&quot;banana&quot;</li>
+<li>&quot;yes&quot;</li>
+</ul>
+<p>The basic elements of the grammar are:</p>
+<ul>
+<li><strong>&lt;rule&gt;</strong> defines a rule. The &quot;root&quot; rule must cover the whole utterance. Each rule contains a list of elements that should match.</li>
+<li><strong>&lt;ruleref&gt;</strong> matches another rule.</li>
+<li><strong>&lt;one-of&gt;</strong> matches one of the sub-items.</li>
+<li><strong>&lt;item&gt;</strong> matches a string or a list of other elements.</li>
+<li><strong>&lt;item repeat=&quot;0-1&quot;&gt;</strong> matches the contents 0 to 1 times (which means that it is optional).</li>
+<li><strong>&lt;tag&gt;</strong> contains a Javascript that creates the resulting semantics
+<ul>
+<li>The resulting object can be referred to with the &quot;out&quot; variable. By default, it is assumed to be a Javascript object. Javascript objects can be regarded as a record with any number of fields, which can be assigned with dot-notation (out.topping=&quot;cheese&quot;).</li>
+<li>If you assign a field with another object (such as the output of another rule), you will created nested records (as in the example above). To refer to the output of the matching rules, you can use rule.[name_of_the_rule] (e.g. &quot;out.size = rules.size&quot;).</li>
+<li>Not all rules gives a Javascript object as output. If no &lt;tag&gt; is specified, the result will be a string with the matching words of the rule (see for example the &quot;flavor&quot; rule). But you can also specify a string output like this: out=&quot;banana&quot;, or an integer output like this: out=1.</li>
+<li>In IrisTK, the Javascript object is transformed into a Java-object of type <a href="http://www.iristk.net/javadoc/iristk/util/Record.html">iristk.util.Record</a>.</li>
+</ul></li>
+</ul>
+<p>If you want to understand how the grammar works in more depth, you can read the official <a href="http://www.w3.org/TR/speech-grammar/">W3C SRGS specification</a>.</p>
+<h3 id="open-vocabulary-recognizers-and-semantic-grammars">Open vocabulary recognizers and semantic grammars</h3>
+<p>Whereas a speech grammar needs to match exactly what the user said, you can also use an open vocabulary recognizer that does not rely on a speech grammar. In most cases, the speech recognition will not be perfect with such a recognizer, and as long as the user speaks in-grammar, grammar-based speech recognition will often perform better. But in many cases it is simply impossible to write a grammar that covers everything the user might say.</p>
+<p>For this section, we will use the Nuance cloud-based recognizer. You will need to <a href="http://developer.nuance.com/public/index.php?task=register">sign up for a developer account</a>, get your APP_ID and APP_KEY, and follow the instructions in the addon/NuanceCloud/readme.txt file under the IrisTK installation. Remember that the free account can be used for developing purposes only. If you do not want to do this, you can safely skip this section and continue with the dialog flow.</p>
+<p>Whereas the speech grammar describes both what the recognizer should listen for, and how this should be interpreted into semantics, an open vocabulary recognizer does not produce any semantic interpretation by itself. Thus we must provide it with a Semantic Grammar. The semantic grammar uses the same format as the speech grammar (SRGS), but the parsing is more relaxed. Thus, there is no requirement that the &quot;root&quot; rule must match the whole input. Instead, the grammar can match individual phrases in the input with &quot;garbage&quot; words in between. The parser tries to match all rules that are marked with the attribute public=&quot;true&quot;, to cover as many words as possible with as high-level rules as possible. In our grammar example, only the &quot;root&quot; rule is marked as public. However, this rule is designed so that it can also match short key phrases such as &quot;a cheese burger&quot; and &quot;a large coke&quot;. Thus, even if the user says something that is not covered by the root rule, such as &quot;I'm gonna have a cheese burger and then I want a large coke&quot;, the parser will match these phrases, and then combine the semantics.</p>
+<p>To try this out, choose the Nuance Cloud recognizer from the drop-down. Open BurgerGrammar.xml into the Semantic Grammar window (bottom right), and press Load. Then you can press Listen and say something to see the result. Be aware that since the recognition is cloud-based, the result will take a little bit more time than with the Windows recognizer. You can also try to write a text string in the bottom of the Semantic Grammar window and press Parse. Then you will also see how the individual phrases match.</p>
+<p>The semantic grammar also allows for some more tricks that are not supported by the speech grammar. You can use the &quot;_&quot; symbol in words to match zero to many characters. Thus &quot;_burger_&quot; would match both &quot;burger&quot;, &quot;hamburger&quot; and &quot;cheeseburgers&quot;. (In fact you can use any <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a>, but &quot;_&quot; is interpreted as &quot;.*&quot;).</p>
+<p>If you want to use the Nuance Cloud recognizer and the semantic grammar in the BurgerSystem, add them like this:</p>
+<pre class="sourceCode java"><code class="sourceCode java">system.<span class="fu">setupRecognizer</span>(<span class="kw">new</span> <span class="fu">NuanceCloudRecognizerFactory</span>());
+system.<span class="fu">loadContext</span>(<span class="st">&quot;default&quot;</span>, <span class="kw">new</span> <span class="fu">OpenVocabularyContext</span>(system.<span class="fu">getLanguage</span>()));
+system.<span class="fu">loadContext</span>(<span class="st">&quot;default&quot;</span>, <span class="kw">new</span> <span class="fu">SemanticGrammarContext</span>(<span class="kw">new</span> <span class="fu">SRGSGrammar</span>(<span class="fu">getClass</span>().<span class="fu">getResource</span>(<span class="st">&quot;BurgerGrammar.xml&quot;</span>).<span class="fu">toURI</span>())));</code></pre>
+<p>As you can see, we associate both an open vocabulary grammar and a semantic grammar to the context &quot;default&quot;.</p>
+<p>It is also possible to combine speech grammars with semantic grammars in recognizers that use speech grammars, such as the Windows recognizer (using both SpeechGrammarContext and SemanticGrammarContext). In this case, the speech grammar will define what can be said (but the &lt;tag&gt; elements will be ignored), and the resulting text string will be parsed and interpreted with the semantic grammar.</p>
+<h3 id="using-different-speech-contexts">Using different speech contexts</h3>
+<p>As you have seen, the application can associate different speech and semantic models with a certain context name. In this case, we have only used one context (called &quot;default&quot;), but it is possible to create different contexts that can be used in different dialog states. Then you can listen for speech and interpret it using a specific context:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:listen</span><span class="ot"> context=</span><span class="st">&quot;&#39;mycontext&#39;&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>If you have multiple contexts, you should also specify which context is supposed to be the default context, if no specific context is provided when you &lt;listen&gt; for speech:</p>
+<pre class="sourceCode java"><code class="sourceCode java">system.<span class="fu">setDefaultContext</span>(<span class="st">&quot;mycontext&quot;</span>);</code></pre>
+<h3 id="a-slot-filling-dialog-flow">A slot-filling dialog flow</h3>
+<p>To manage the burger orders, we will implement a simple slot-filling algorithm in the flow. By &quot;slot-filling&quot;, we mean that the system will check that it has received all pieces of information that are necessary before finishing the order. In case there are slots missing, the system will request more detailed information from the user.</p>
+<p>Open up the BurgerFlow.xml and replace the contents with this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;flow</span><span class="ot"> name=</span><span class="st">&quot;BurgerFlow&quot;</span><span class="ot"> package=</span><span class="st">&quot;iristk.app.burger&quot;</span> 
+<span class="ot">    initial=</span><span class="st">&quot;Start&quot;</span><span class="ot"> xmlns=</span><span class="st">&quot;iristk.flow&quot;</span><span class="ot"> xmlns:p=</span><span class="st">&quot;iristk.flow.param&quot;</span><span class="ot"> xmlns:dialog=</span><span class="st">&quot;iristk.flow.DialogFlow&quot;</span><span class="ot"> xmlns:xsi=</span><span class="st">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="ot">    xsi:schemaLocation=</span><span class="st">&quot;iristk.flow flow.xsd iristk.flow.DialogFlow DialogFlow.xsd&quot;</span><span class="kw">&gt;</span>
+    
+    <span class="kw">&lt;var</span><span class="ot"> name=</span><span class="st">&quot;order&quot;</span><span class="ot"> type=</span><span class="st">&quot;Record&quot;</span><span class="ot"> value=</span><span class="st">&quot;new Record()&quot;</span><span class="kw">/&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Start&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;count == 1&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;dialog:say&gt;</span>Welcome<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>May I please take your order<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>    
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:order&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order.adjoin(asRecord(event:sem:order))<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Sorry, I <span class="kw">&lt;str</span><span class="ot"> cond=</span><span class="st">&quot;count &gt; 1&quot;</span><span class="kw">&gt;</span>still<span class="kw">&lt;/str&gt;</span> didn&#39;t get that<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;reentry/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.silence&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Sorry, I <span class="kw">&lt;str</span><span class="ot"> cond=</span><span class="st">&quot;count &gt; 1&quot;</span><span class="kw">&gt;</span>still<span class="kw">&lt;/str&gt;</span> didn&#39;t hear anything<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;reentry/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;!order?:main&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestMain&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;!order?:drink&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestDrink&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;eq(order:drink:type, &#39;milkshake&#39;) and !order?:drink:flavor&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestFlavor&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;!order?:side&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestSide&quot;</span><span class="kw">/&gt;</span> 
+            <span class="kw">&lt;else/&gt;</span>
+                <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Done&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestMain&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Do you want a hamburger?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order:main:type = &quot;hamburger&quot;<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order:main:type = &quot;none&quot;<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestDrink&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Do you want anything to drink?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>So what do you want to drink?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order:drink:type = &quot;none&quot;<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestFlavor&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>What flavor do you want in your milkshake?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:flavor&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order:drink:flavor = event:sem:flavor<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestSide&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Do you want anything on the side, such as fries or sallad?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>So what do you want on the side?<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;dialog:listen/&gt;</span>
+        <span class="kw">&lt;/onevent&gt;</span>
+        <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>order:side:type = &quot;none&quot;<span class="kw">&lt;/exec&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+        <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+    <span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Done&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;onentry&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Okay, thanks for your order<span class="kw">&lt;/dialog:say&gt;</span>
+            <span class="kw">&lt;log&gt;&lt;expr&gt;</span>order.toStringIndent()<span class="kw">&lt;/expr&gt;&lt;/log&gt;</span>
+            <span class="kw">&lt;exec&gt;</span>System.exit(0)<span class="kw">&lt;/exec&gt;</span>
+        <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;/state&gt;</span>
+    
+<span class="kw">&lt;/flow&gt;</span></code></pre>
+<p>You should now be able to compile the flow and then run BurgerSystem.java to try out the application.</p>
+<p>Let's now look at the flow. To keep track of the order, we start by creating a variable &quot;order&quot; of type &quot;Record&quot;. The initial state in the flow is &quot;Start&quot;, which looks like this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Start&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;count == 1&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:say&gt;</span>Welcome<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;/if&gt;</span>
+        <span class="kw">&lt;dialog:say&gt;</span>May I please take your order<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;dialog:listen/&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+<span class="kw">&lt;/state&gt;</span>    </code></pre>
+<p>The contents of this state should be familiar (if you have taken Tutorial 1), but there is one new thing: We make use of the special variable &quot;count&quot;. This variable is very useful, it keep tracks of how many times this event handler has been triggered throughout this state's lifetime. If there is a transition (with &lt;goto&gt;), this counter will be reset. Thus, we can make sure that the system only says &quot;Welcome&quot; once, in case there is a &lt;reentry&gt;. Note that there are no event handlers to handle the result of the &lt;dialog:listen&gt; action, they are defined in the generic &quot;Dialog&quot; state:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:order&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;exec&gt;</span>order.adjoin(asRecord(event:sem:order))<span class="kw">&lt;/exec&gt;</span>
+        <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;dialog:say&gt;</span>Sorry, I <span class="kw">&lt;str</span><span class="ot"> cond=</span><span class="st">&quot;count &gt; 1&quot;</span><span class="kw">&gt;</span>still<span class="kw">&lt;/str&gt;</span> didn&#39;t get that<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;reentry/&gt;</span>  
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.silence&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;dialog:say&gt;</span>Sorry, I <span class="kw">&lt;str</span><span class="ot"> cond=</span><span class="st">&quot;count &gt; 1&quot;</span><span class="kw">&gt;</span>still<span class="kw">&lt;/str&gt;</span> didn&#39;t hear anything<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;reentry/&gt;</span>  
+    <span class="kw">&lt;/onevent&gt;</span>
+<span class="kw">&lt;/state&gt;</span></code></pre>
+<p>The first event handler will be triggered if the user utterance contains an order. Notice how the deep record structure of the semantic can be queried with &quot;event?:sem:order&quot; (meaning: &quot;does the 'event' contain a 'sem' field, which in turn contains an 'order' field?&quot;). Compare with the example semantic records we have seen from the recognizer. The semantics if the order is then adjoined to the flow-level &quot;order&quot; variable, after which we transition to the &quot;CheckOrder&quot; state to see if the order is complete. We also have two event handlers to handle utterances without any meaningful semantics, and silence from the user. Note again how we make use of the &quot;count&quot; variable in the &lt;str&gt; tag to make the system utterances more varied and context-aware.</p>
+<p>The &quot;CheckOrder&quot; state then goes through the fields and checks if there are any missing slots:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;!order?:main&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestMain&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;!order?:drink&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestDrink&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;eq(order:drink:type, &#39;milkshake&#39;) and !order?:drink:flavor&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestFlavor&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;elseif</span><span class="ot"> cond=</span><span class="st">&quot;!order?:side&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;RequestSide&quot;</span><span class="kw">/&gt;</span> 
+        <span class="kw">&lt;else/&gt;</span>
+            <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;Done&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/if&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+<span class="kw">&lt;/state&gt;</span></code></pre>
+<p>The code should be self-explanatory. Note that we can check both more shallow slots such as &quot;order:drink&quot;, but also deeper slots such as &quot;order:drink:flavor&quot;, in case the user ordered a milkshake but did not specify the flavor. For each type of slot that can be requested, a specific state is defined. Let's look at &quot;RequestDrink&quot;:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;RequestDrink&quot;</span><span class="ot"> extends=</span><span class="st">&quot;Dialog&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;dialog:say&gt;</span>Do you want anything to drink?<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;dialog:listen/&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;dialog:say&gt;</span>So what do you want to drink?<span class="kw">&lt;/dialog:say&gt;</span>
+        <span class="kw">&lt;dialog:listen/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;exec&gt;</span>order:drink:type = &quot;none&quot;<span class="kw">&lt;/exec&gt;</span>
+        <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;CheckOrder&quot;</span><span class="kw">/&gt;</span>  
+    <span class="kw">&lt;/onevent&gt;</span>
+<span class="kw">&lt;/state&gt;</span></code></pre>
+<p>The state starts by asking &quot;Do you want anything to drink?&quot;. Note that the design of the flow now allows the user to reply in a number of different ways:</p>
+<ul>
+<li>If the user says &quot;I want a coke&quot; or just &quot;a coke&quot;, this is handled in the &quot;Dialog&quot; state. Since the drink will be adjoined to the order, the CheckOrder will not ask for the drink again.</li>
+<li>If the user just says &quot;yes&quot;, the system will ask a more direct question &quot;So what do you want to drink?&quot;.</li>
+<li>If the user says &quot;no&quot;, the system will fill this slot with the value &quot;none&quot;, so that the CheckOrder will not ask for the drink again.</li>
+<li>The user can also say something else such as &quot;I want a sallad&quot;, which will be adjoined to the order. The CheckOrder will then ask for the drink again. However, it will not ask if the user wants a sallad later on, since this information has already been provided.</li>
+<li>Similarly, the user can over-answer the question with &quot;a coke and a sallad please&quot;. Again, this extra information will not be lost.</li>
+</ul>
+<p>This shows how a relatively compact dialog design with hierarchical states can be used to allow for a very flexible dialog with many different scenarios. It should be possible to apply the same pattern to many different applications, such as ticket or restaurant booking. In the Chess example that comes with IrisTK, you can also see how this pattern is used.</p>
+<p>Once the order is complete, it will be printed in the console (with the &lt;log&gt; action), so that you can see what it looks like.</p>
+<h3 id="allowing-barge-in">Allowing barge-in</h3>
+<p>As it is now, the system is either speaking or listening. Thus, it is not possible for the user to iterrupt the system. A common feature in dialog systems is to allow barge-in, which means that the user can interrupt the system while it is speaking. For this, there is a reusable behavior called &lt;dialog:prompt&gt; that we can use instead of &lt;dialog:say&gt; and &lt;dialog:listen&gt;.</p>
+<p>Try to replace this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:say&gt;</span>May I please take your order<span class="kw">&lt;/dialog:say&gt;</span>
+<span class="kw">&lt;dialog:listen/&gt;</span></code></pre>
+<p>with this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dialog:prompt&gt;</span>May I please take your order<span class="kw">&lt;/dialog:prompt&gt;</span></code></pre>
+<p>Similarly, you can do this at all places where you have a &lt;dialog:say&gt; and &lt;dialog:listen&gt;. Now, you should be able to interrupt the system while it is speaking.</p>
+<p><em>Note</em>: there is currently no echo cancellation built into IrisTK. Thus, if you have an open microphone and an open speaker, the system may interrupt itself. However, if you are using a headset or a laptop with built-in echo cancellation, you should be fine.</p>
+<h3 id="adding-a-resusable-confirmation-dialog">Adding a resusable confirmation dialog</h3>
+<p>So far, the system has simply accepted all speech recognition results without any confirmation (such as &quot;did you say a large coke?&quot;). This may lead to misunderstandings. However, confirming everything the user says is very tedious, so a common strategy is to look at the confidence score from the recognizer to determine whether to confirm or not.</p>
+<p>It would not be very elegant to add such a check for confirmation and implement a confirmation dialog after each request the system makes. The confirmation pattern is also similar regardless of what the system requested. Thus, the best thing would be if we could create a behavior that could be reused between different applications. The &lt;dialog:say&gt;, &lt;dialog:listen&gt; and &lt;dialog:prompt&gt; are already examples of such reusable behaviors. So, let's create such a behavior for requests that can be confirmed. In IrisTK, reusable behaviors are implemented as states, and then we <em>call</em> these states. There are two important differences between &quot;call&quot; and &quot;goto&quot;: (1) When a state is called, the event handlers of the calling state are still checked for (after the event handlers of the called state), (2) The called state can make a &lt;return&gt; to the calling state. If that state was in the middle of a series of executing actions, this execution will continue from where it was. You can read more about the difference between <em>call</em> and <em>goto</em> in <a href="irisflow_overview.html">IrisFlow overview</a>.</p>
+<p>We will name this new behavior &quot;ask&quot;. It also needs another help-state &quot;confirm&quot;:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;ask&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;text&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;threshold&quot;</span><span class="ot"> type=</span><span class="st">&quot;Float&quot;</span><span class="ot"> default=</span><span class="st">&quot;0.7&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;dialog:prompt</span><span class="ot"> text=</span><span class="st">&quot;text&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;threshold &gt; asFloat(event:conf)&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;goto</span><span class="ot"> state=</span><span class="st">&quot;confirm&quot;</span><span class="ot"> p:cevent=</span><span class="st">&quot;event&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak sense.user.silence&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;return</span><span class="ot"> copy=</span><span class="st">&quot;event&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+<span class="kw">&lt;/state&gt;</span>
+
+<span class="kw">&lt;state</span><span class="ot"> id=</span><span class="st">&quot;confirm&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;param</span><span class="ot"> name=</span><span class="st">&quot;cevent&quot;</span><span class="ot"> type=</span><span class="st">&quot;Event&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;onentry&gt;</span>
+        <span class="kw">&lt;if</span><span class="ot"> cond=</span><span class="st">&quot;cevent?:sem:confirm&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;dialog:prompt&gt;</span>Did you say <span class="kw">&lt;expr&gt;</span>cevent:sem:confirm<span class="kw">&lt;/expr&gt;&lt;/dialog:prompt&gt;</span>
+        <span class="kw">&lt;else/&gt;</span>
+            <span class="kw">&lt;dialog:prompt&gt;</span>Did you say <span class="kw">&lt;expr&gt;</span>cevent:text<span class="kw">&lt;/expr&gt;&lt;/dialog:prompt&gt;</span>
+        <span class="kw">&lt;/if&gt;</span>
+    <span class="kw">&lt;/onentry&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:yes&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;return</span><span class="ot"> copy=</span><span class="st">&quot;cevent&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="ot"> cond=</span><span class="st">&quot;event?:sem:no&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;return</span><span class="ot"> event=</span><span class="st">&quot;sense.user.speak&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+    <span class="kw">&lt;onevent</span><span class="ot"> name=</span><span class="st">&quot;sense.user.speak sense.user.silence&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;return</span><span class="ot"> copy=</span><span class="st">&quot;event&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/onevent&gt;</span>
+<span class="kw">&lt;/state&gt;</span></code></pre>
+<p>The state &quot;ask&quot; takes two parameters: &quot;text&quot; (what to ask) and a &quot;threshold&quot;. The threshold is used to determine whether the input from the user should be confirmed or not, based on the confidence score. This is 0.7 by default, but by having it as a parameter, it can be set differently for different questions. You should be aware that different recognizers provides different typical scores. The Nuance Cloud recognizer always returns 1, so it will never engage in confirmation.</p>
+<p>On entry, the &quot;ask&quot; state prompts the user with the question (note that the value of the &quot;text&quot; parameter here is the provided parameter). If a speech recognition result is returned (sense.user.speak), the system checks whether the confidence is below the threshold and it should be confirmed. Otherwise, the called state returns and the speech event is raised in the calling state.</p>
+<p>Note that if a transition to the &quot;confirm&quot; state takes place, the flow still keeps the calling state. This means that the calling states event handlers are still active (but not the event handlers of &quot;ask&quot;). Thus, if we make a &quot;return&quot; from the &quot;confirm&quot; state, we end up in the state that called the &quot;ask&quot; state (as seen on the left in the picture below). However, if an event handler in the calling state issues a &quot;goto&quot;, the called states is aborted (as illustrated on the right).</p>
+<div class="figure">
+<img src="img/transitions2.png" />
+
+</div>
+<p>The &quot;confirm&quot; state takes the original event (cevent) as a parameter. It then asks a yes/no question to the user using the recognized text. However, we have added an extra trick here to avoid very tedious wordings. For example, it would not be very elegant if the system would say &quot;Did you say I want to order a hamburger and a coke please&quot;?. We would rather want it to say &quot;Did you say a hamburger and a milkshake?&quot;. To make this possible, we add an extra (optional) field to the semantics called &quot;confirm&quot; that collects the words that should be used in case of a confirmation. In the root rule, change the semantic instruction &lt;tag&gt;out.order = rules.order&lt;/tag&gt; into:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;tag&gt;</span>out.order = rules.order; out.confirm = meta.order.text<span class="kw">&lt;/tag&gt;</span></code></pre>
+<p>The &quot;meta.order.text&quot; returns the text that matched the &quot;order&quot; rule, and this is now placed int the &quot;confirm&quot; field of the output. If this field is present, it will be used by the &quot;confirm&quot; state, otherwise the whole text will be used. Now if the user confirms with a &quot;yes&quot;, the state will return, and the original speech event will be raised in the calling state. If the user says &quot;no&quot;, a new &quot;sense.user.speak&quot; state will be raised, which will trigger a non-understanding in the calling state (since it doesn't contain any text or semantics). If the user is silent or says simething else, the corresponding event will be raised in the calling state. Thus, if the user says something like &quot;I want a coke&quot; instead of replying to the yes/no question, it will be handled appropriately.</p>
+<p>Now, we can call this &quot;ask&quot; state with this constuction:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;call</span><span class="ot"> state=</span><span class="st">&quot;ask&quot;</span><span class="kw">&gt;</span>May I please take your order<span class="kw">&lt;/call&gt;</span></code></pre>
+<p>However, it is more elegant to call it with a custom tag. To do this, add the following attribute to the &lt;flow&gt; tag:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml">xmlns:this=&quot;iristk.app.burger.BurgerFlow&quot;</code></pre>
+<p>You can now replace all &lt;dialog:prompt&gt; tags with &lt;this:ask&gt; tags like this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;this:ask&gt;</span>May I please take your order<span class="kw">&lt;/this:ask&gt;</span></code></pre>
+<p>If you reply to any of these question in a &quot;sloppy&quot; way, the system should engage in a confirmation. Try to respond in different ways to the confirmation and see what happens. You might have to adjust the default threshold for this to happen.</p>
+<p>If you open core/src/flow/DialogFlow.xml, you could actually add this new behavior there, so that it could be reused from other flows (with &lt;dialog:ask&gt;). It would then need to be declared &quot;static&quot; and &quot;public&quot;. To read more about this, please refer to <a href="irisflow_advanced.html">IrisFlow: Advanced topics</a>.</p>
+<h3 id="situated-interaction-handling-multiple-customers">Situated interaction: Handling multiple customers</h3>
+<p>TBA</p>
+		
+		</div>
+
+		<div class="large-4 columns">
+			<h3>Guide to IrisTK</h3>
+			
+			<div class="section-container accordion" data-section="accordion">
+				
+				<section class="active"><p class="title" data-section-title><a href="#">Getting started</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="overview.html">Overview of IrisTK</a></li><li><a href="installation.html">Installation</a></li><li><a href="develop_in_eclipse.html">Develop in Eclipse</a></li><li><a href="tutorial_first_app.html">Tutorial 1: Your first application</a></li><li><a href="tutorial_sitint.html">Tutorial 2: Situated interaction</a></li><li class="active"><a href="tutorial_semantics.html">Tutorial 3: Semantics and dialog</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">System, modules and events</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="system_overview.html">System and Events</a></li><li><a href="events.html">Standardized Events</a></li><li><a href="creating_new_modules.html">Creating new modules</a></li><li><a href="distributed_systems.html">Distributed systems</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">IrisFlow</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="irisflow_overview.html">IrisFlow overview</a></li><li><a href="irisflow_reference.html">IrisFlow reference</a></li><li><a href="irisflow_advanced.html">Advanced topics</a></li></ul></div></section><section><p class="title" data-section-title><a href="#">Reference</a></p><div class="content" data-section-content><ul class="side-nav"><li><a href="microphones.html">Microphones</a></li><li><a href="furhat.html">Furhat robot head</a></li><li><a href="gestures.html">Facial gestures</a></li><li><a href="cereproc.html">Cereproc TTS</a></li><li><a href="../javadoc/index.html">Javadoc</a></li></ul></div></section>		
+			  
+			</div>
+			
+		</div>
+	</div>
+	
+	
+	<div class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<p>Copyright &copy; Gabriel Skantze, 2013-</p>
+		</div>
+	</div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="js/foundation.min.js"></script>
+
+  <script src="js/foundation/foundation.js"></script>
+  
+  <script src="js/foundation/foundation.alerts.js"></script>
+  
+  <script src="js/foundation/foundation.clearing.js"></script>
+  
+  <script src="js/foundation/foundation.cookie.js"></script>
+  
+  <script src="js/foundation/foundation.dropdown.js"></script>
+  
+  <script src="js/foundation/foundation.forms.js"></script>
+  
+  <script src="js/foundation/foundation.joyride.js"></script>
+  
+  <script src="js/foundation/foundation.magellan.js"></script>
+  
+  <script src="js/foundation/foundation.orbit.js"></script>
+  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  
+  <script src="js/foundation/foundation.section.js"></script>
+  
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  
+  <script src="js/foundation/foundation.topbar.js"></script>
+  
+  <script src="js/foundation/foundation.interchange.js"></script>
+  
+  <script src="js/foundation/foundation.placeholder.js"></script>
+  
+  <script src="js/foundation/foundation.abide.js"></script>
+
+  
+  
+  <script>
+    $(document).foundation();
+  </script>
+</body>
+</html>
