@@ -17,6 +17,8 @@
           <item>ten<tag>out.number=10</tag></item>
           <item>yes<tag>out.yes=1</tag></item>
           <item>no<tag>out.no=1</tag></item>
+          <item>next</item>
+          <item>back</item>
       </one-of>
   </rule>
   
