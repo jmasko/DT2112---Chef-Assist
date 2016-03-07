@@ -27,7 +27,7 @@ public class MyDialogManager extends IrisModule{
         if (event.triggers("monitor.system.start")) {
             // The system started, listen for speech
             Event entryMsg = new Event("action.speech");
-            String msg = steps[0];
+            String msg = "Welcome to the Chef Assistant.";
             entryMsg.put("text", msg);
             send(entryMsg);
             pointer = 0;
@@ -76,7 +76,7 @@ public class MyDialogManager extends IrisModule{
                     else if(text.equals("repeat all steps"))
                     {
                         for (int i = 0; i < steps.length; i++) {
-                            repeatSteps += steps[i]+ ".";
+                            repeatSteps += steps[i]+ " ";
                         }
                         outputStep.put("text", repeatSteps);
                     }
@@ -84,8 +84,31 @@ public class MyDialogManager extends IrisModule{
                     {
                         outputStep.put("text", ingredients[pointer]);
                     }
+                    else if(text.equals("repeat all ingredient"))
+                    {
+                        String ingredientRepeat = "";
+                        for (int i = 0; i < ingredients.length; i++) {
+                            ingredientRepeat += ingredients[i] + " ";
+                        }
+                        outputStep.put("text", ingredientRepeat);
+                    }
+                    else if(text.equals("read directions"))
+                    {
+                        outputStep.put("text", steps[0]);
+                    }
+                    else if(text.indexOf("how much") != -1)
+                    {
+                        if(text.indexOf("lemon") != -1)
+                            outputStep.put("text", "too much");
+                        else if(text.indexOf("salt") != -1)
+                            outputStep.put("text", "100 kilograms");
+                        else if(text.indexOf("computer") != -1)
+                            outputStep.put("text", "two computers");
+                        else
+                            outputStep.put("text", "ingredient does not exist");
+                    }
                     else{
-                        outputStep.put("text", "no can do ass hat");
+                        outputStep.put("text", "I did not understand that");
                     }
                 }
                 send(outputStep);

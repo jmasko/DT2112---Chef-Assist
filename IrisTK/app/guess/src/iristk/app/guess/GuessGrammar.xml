@@ -22,7 +22,19 @@
             <item>repeat</item>
             <item>repeat all steps</item>
             <item>repeat ingredient</item>
+            <item>repeat all ingredient</item>
+            <item>read directions</item>
+            <item>how much
+                <ruleref uri="#ingredientName" />
+            </item>
         </one-of>
     </rule>
-
+    <rule id="ingredientName">
+        <one-of>
+            <item>lemon</item>
+            <item>apple</item>
+            <item>salt</item>
+            <item>computer</item>
+        </one-of>
+    </rule>
 </grammar>
