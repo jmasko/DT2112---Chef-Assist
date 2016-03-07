@@ -6,19 +6,28 @@ import iristk.system.InitializationException;
 import iristk.system.IrisModule;
 
 public class MyDialogManager extends IrisModule{
-	public static String[] steps = {"step 1", "step 2", "step 3", "step 4"
-			,"step 5", "step 6"};
-	
-	public static int pointer = 0;
-	@Override
-	public void onEvent(Event event) {
-		// TODO Auto-generated method stub
-	      // We have received an event from some other module, 
+    public static String[] steps = {
+            "step 1", "step 2", "step 3","step 4","step 5", "step 6",
+            "step 7","step 8","step 9"
+            ,"step 10"
+    };
+    public static String[] ingredients = {
+            "step 1 ingredient","step 2 ingredient","step 3 ingredient",
+            "step 4 ingredient","step 5 ingredient","step 6 ingredient",
+            "step 7 ingredient","step 8 ingredient","step 9 ingredient",
+            "step 10 ingredient"
+    };
+
+    public static int pointer = 0;
+    @Override
+    public void onEvent(Event event) {
+        // TODO Auto-generated method stub
+        // We have received an event from some other module,
         // check whether we should react to it
         if (event.triggers("monitor.system.start")) {
             // The system started, listen for speech
-        	Event entryMsg = new Event("action.speech");
-        	String msg = steps[0];
+            Event entryMsg = new Event("action.speech");
+            String msg = steps[0];
             entryMsg.put("text", msg);
             send(entryMsg);
             pointer = 0;
@@ -37,24 +46,46 @@ public class MyDialogManager extends IrisModule{
                 else{
                     // Add the parameter text, which will repeat the speech recognition result
                     newEvent.put("text", "You said " + text);
-                    
+                    String repeatSteps = "";
                     if(text.equals("next"))
                     {
-                    	outputStep.put("text", steps[pointer+1]);
-                    	pointer++;
+                        if(pointer+1 < steps.length)
+                        {
+                            outputStep.put("text", steps[pointer+1]);
+                            pointer++;
+                        }
+                        else
+                        {
+                            outputStep.put("text", steps[steps.length-1]);
+                        }
                     }
                     else if(text.equals("back"))
                     {
-                    	if(pointer == 0){
-                        	outputStep.put("text", steps[0]);
-                    	}
-                    	else{
-                        	outputStep.put("text", steps[pointer-1]);
-                        	pointer--;
-                    	}
+                        if(pointer == 0){
+                            outputStep.put("text", steps[0]);
+                        }
+                        else{
+                            outputStep.put("text", steps[pointer-1]);
+                            pointer--;
+                        }
+                    }
+                    else if(text.equals("repeat"))
+                    {
+                        outputStep.put("text", steps[pointer]);
+                    }
+                    else if(text.equals("repeat all steps"))
+                    {
+                        for (int i = 0; i < steps.length; i++) {
+                            repeatSteps += steps[i]+ ".";
+                        }
+                        outputStep.put("text", repeatSteps);
+                    }
+                    else if(text.equals("repeat ingredient"))
+                    {
+                        outputStep.put("text", ingredients[pointer]);
                     }
                     else{
-                    	outputStep.put("text", "no can do ass hat");
+                        outputStep.put("text", "no can do ass hat");
                     }
                 }
                 send(outputStep);
@@ -67,17 +98,17 @@ public class MyDialogManager extends IrisModule{
             // The synthesizer completed, listen for speech again
             listen();
         }
-	}
+    }
 
-	// Make the recognizer start listening
+    // Make the recognizer start listening
     private void listen() {
         send(new Event("action.listen"));
     }
-	
-	@Override
-	public void init() throws InitializationException {
-		// TODO Auto-generated method stub
-		
-	}
+
+    @Override
+    public void init() throws InitializationException {
+        // TODO Auto-generated method stub
+
+    }
 
 }
