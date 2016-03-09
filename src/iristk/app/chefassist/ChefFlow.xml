@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<flow name="ChefFlow" package="iristk.app.chefassist" 
+	initial="Initial" xmlns="iristk.flow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="iristk.flow.param"
+	xmlns:agent="iristk.situated.SystemAgentFlow"
+	xmlns:dialog="iristk.flow.DialogFlow"
+	xsi:schemaLocation="iristk.flow flow.xsd iristk.flow.DialogFlow DialogFlow.xsd">
+	
+	<param name="controller" type="ChefController"/>
+	
+	<var name="currentDirection" type="int" value="0"/>
+	<var name="currentRecipe" type="int" value="0"/>
+	<var name="message" type="String"/>
+	
+	<state id="Dialog">
+		<onevent name="sense.user.silence">
+			<dialog:say>I am sorry, I didn't hear anything.</dialog:say>
+			<reentry/>
+		</onevent>
+		<onevent name="sense.user.speak">
+			<dialog:say>I am sorry, I didn't get that.</dialog:say>
+			<reentry/>
+		</onevent>
+		<onevent name="retry">
+	        <reentry/>
+	    </onevent>
+	</state>
+	
+	<state id="Initial" extends="Dialog">
+		<onentry>
+			<exec>message = "Hello! I will assist you in cooking. What would you like to cook?"</exec>
+			<dialog:say><expr>message</expr></dialog:say>
+
+		</onentry>
+		<onevent name="sense.user.speak">
+			<if cond="event?:sem:checkIn">
+				<goto state="CheckIn"/>
+			<elseif cond="event?:sem:checkOut"/>
+				<goto state="CheckOut"/>
+			<elseif cond="event?:sem:book"/>
+				<goto state="StartReservation"/>
+			<elseif cond="event?:sem:cab"/>
+				<goto state="Transportation"/>
+			<elseif cond="event?:sem:meals"/>
+				<goto state="MealTimes"/>
+			<elseif cond="event?:sem:directions"/>
+				<goto state="Directions"/>
+			<elseif cond="event?:sem:roomservice"/>
+				<goto state="RoomService"/>
+			<else/>
+				<reentry/>
+			</if>
+		</onevent>
+	</state>
+	
+	
+</flow>
