@@ -5,5 +5,25 @@
 	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/bin"/>
 	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Face/bin"/>
 	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Microsoft/bin"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Nuance9"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/docking-frames-common.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/docking-frames-core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/batik-gui-util-1.8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/commons.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/freemarker.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/hat.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/jetty.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/jnaerator-0.9.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/JNativeHook.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/jportaudio.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/js-14.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/platform.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/core/lib/turbojpeg.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/NuanceCloud"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Microsoft/lib/IrisTK.Net.Kinect.j4n.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Microsoft/lib/IrisTK.Net.Kinect2.j4n.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Microsoft/lib/IrisTK.Net.Speech.j4n.jar"/>
+	<classpathentry kind="lib" path="C:/Users/HappyTimes/IrisTK/addon/Microsoft/lib/jni4net.j-0.8.8.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

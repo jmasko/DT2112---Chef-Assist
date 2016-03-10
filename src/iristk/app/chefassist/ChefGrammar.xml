@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<grammar xml:lang="en-US" version="1.0" root="srgs_root"
+<grammar xml:lang="en-US" version="1.0" root="root"
 	xmlns="http://www.w3.org/2001/06/grammar" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.w3.org/2001/06/grammar srgs.xsd" tag-format="semantics/1.0">
 	
-	<rule id="srgs_root" scope="public">
-		<one-of>
-			<item>
-				<one-of>
-					<item>yes</item>
-				</one-of>
-				<tag>out.yes=1</tag>
-			</item>
-			<item>
-				<one-of>
-					<item>no</item>
-				</one-of>
-				<tag>out.no=1</tag>
-			</item>
-		</one-of>
-	</rule> 
+ 	<rule id="root" scope="public">
+        <one-of>
+            <item>yes<tag>out.yes=1</tag></item>
+            <item>no<tag>out.no=1</tag></item>
+            <item>next<tag>out.output="next"</tag></item>
+            <item>next instruction<tag>out.output="next"</tag></item>
+            <item>next direction<tag>out.output="next"</tag></item>
+            <item>back</item>
+            <item>repeat</item>
+            <item>repeat all steps</item>
+            <item>repeat ingredient</item>
+            <item>repeat all ingredient</item>
+            <item>read directions</item>
+            <item>how much
+                <ruleref uri="#ingredientName" />
+            </item>
+        </one-of>
+    </rule>
+    <rule id="ingredientName">
+        <one-of>
+            <item>lemon</item>
+            <item>apple</item>
+            <item>salt</item>
+            <item>computer</item>
+        </one-of>
+    </rule>
 	
 </grammar>

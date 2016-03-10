@@ -1,13 +1,13 @@
 package iristk.app.chefassist;
 
-import iristk.situated.SituatedDialogSystem;
+import iristk.system.SimpleDialogSystem;
 
 public class ChefController {
-	private SituatedDialogSystem system;
+	private SimpleDialogSystem system;
 	private Recipe[] recipes = buildTemporaryHardcodedRecipes();
 	private Recipe currentRecipe;
 	
-	public ChefController(SituatedDialogSystem system){
+	public ChefController(SimpleDialogSystem system){
 		this.system = system;
 		currentRecipe = recipes[0];
 	}
