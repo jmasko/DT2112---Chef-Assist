@@ -12,6 +12,7 @@
             <item>next direction<tag>out.output="next"</tag></item>
             <item>back</item>
             <item>repeat</item>
+            <item>steps</item>
             <item>repeat all steps</item>
             <item>repeat ingredient</item>
             <item>repeat all ingredient</item>
