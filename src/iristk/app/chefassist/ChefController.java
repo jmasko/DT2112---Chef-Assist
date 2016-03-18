@@ -17,42 +17,32 @@ public class ChefController {
 	}
 	
 	private Recipe[] buildTemporaryHardcodedRecipes(){
-		Recipe[] r = new Recipe[2];
+		Recipe[] r = new Recipe[1];
 		
-		//Pancakes
+		//Test Recipe
 		Ingredient[] ingredients = new Ingredient[]{
-			new Ingredient("Milk", "dl", 6.0),
-			new Ingredient("Salt", "tsp", 0.5),
-			new Ingredient("Flour", "dl", 2.5),
-			new Ingredient("Eggs", 3.0),
-			new Ingredient("Butter, melted", "g", 50),
+			new Ingredient("cream cheese", "softened", 250, "g"),
+			new Ingredient("milk", 250, "ml"),
+			new Ingredient("butter", "softened", 60, "g"),
+			new Ingredient("egg yolks", 6),
+			new Ingredient("cake flour", 55, "g"),
+			new Ingredient("corn flour", 20, "g"),
+			new Ingredient("lemon zest", 1),
+			new Ingredient("egg whites", 6),
+			new Ingredient("cream of tartar", 0.25, "tsp"),
+			new Ingredient("sugar", 130, "g"),
 		};
-		String[]  directions = new String[]{
-			"Mix salt and flour in a bowel",
-			"Add half of the milk. Mix it together",
-			"Add the other half of the milk. Mix it together.",
-			"Add the eggs one at the time.",
-			"Add the butter to the mix.",
-			"Pour about 0.5 declilitres of the pancake mix on a medium high heated frying pan. Fry about 1 minute on each side. Repeat until finished.",
+		String[] directions = new String[]{
+				"Preheat oven to 150 degrees celcius",
+				"Use a large bowl, pour in milk. Place the bowl over simmering water. Don’t let the bottom of the bowl touch the water. ",
+				"Add cream cheese, stir occasionally until completely dissolved and the mixture turns smooth. Stir in butter, till dissolved. ",
+				"Remove the mixture from heat and let it cool down a bit, then add the egg yolks and mix well.",
+				"Mix the cake flour and corn flour. Sift in the flours into the cream cheese mixture, a small amount at a time. Mix well between every addition, and make sure there aren’t any flour lumps. Stir in freshly grated zest. Set aside.",
+				"Place egg whites in a large clean bowl. Use an electric mixer to beat the egg whites for 3 minutes, then add cream of tartar and blend again. Pour sugar in the egg whites and blend until very the mixture becomes half solid. ",
+				"Add the egg whites into the cream cheese mixture gently with a rubber spatula just until all ingredients are mixed well. Do not stir or beat. ",
+				"Pour the mixture into the two baking pans. Place the pans into another larger baking tray. Add hot water in the tray up to halfway and bake for about 50 to 60 minutes. Test with a needle or skewer that comes out clean.",
+				"Turn off the oven. Leave the oven door slightly open for 10 minutes. Remove from the oven and remove from the pans. Let cool completely on a wire rack. Chill in a fridge for about 3 hours then the cake will be ready to be served."
 		};
-		r[0] = new Recipe("Pancakes", directions, ingredients);
-		
-		//Manly Meatballs
-		ingredients = new Ingredient[]{
-			new Ingredient("Ground Beef", "kg", 0.5),
-			new Ingredient("Breadcrumbs", "dl", 0.5),
-			new Ingredient("Milk", "dl", 1),
-			new Ingredient("chopped onion", "tbsp", 2),
-			new Ingredient("Egg", "", 1),
-			new Ingredient("Salt", "tsp", 1),
-			new Ingredient("Pepper", "ml", 1),
-		};
-		directions = new String[]{
-				"In a manly bowel; mix breadcrums and milk. Let it soak for 10 minutes or until it grows a beard",
-				"Put in the ground beef, salt, pepper, egg and chipped onion. Mix using your fist",
-				"When it starts to fight back, you can form meatballs. A true man makes at most 1 ball",
-				"Cook over open fire, holding them with your hands.",
-				};
 		r[1] = new Recipe("Manly Meetballs", directions, ingredients);
 		
 		return r;

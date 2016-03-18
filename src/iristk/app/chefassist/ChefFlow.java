@@ -4,7 +4,6 @@ import iristk.app.chefassist.states.ChefState;
 import iristk.app.chefassist.states.DirectionsState;
 import iristk.app.chefassist.states.IngredientState;
 import iristk.app.chefassist.states.InitState;
-import iristk.speech.RecResult;
 import iristk.system.Event;
 import iristk.system.InitializationException;
 import iristk.system.IrisModule;
@@ -39,11 +38,16 @@ public class ChefFlow extends IrisModule{
         if (event.triggers("monitor.system.start")) {
         	Event message;
             message = new Event("action.speech");
-            message.put("text", "Welcome to the Chefs Assistant. What recipe would you like to read?");
+            message.put("text", "Welcome to the Chefs Assistant. What recipe would you like assistance with?");
             send(message);
             listen();
         } else if (event.triggers("sense.speech.rec**")) {
-        	states[currentState].handleEvent(this, event);
+        	String input = event.getString("text");
+            if (input != null && input.length() > 0) {
+            	states[currentState].handleEvent(this, event);
+            } else {
+            	listen();
+            }
         } else if (event.triggers("monitor.speech.end")) {
             // The synthesizer completed, listen for speech again
             listen();

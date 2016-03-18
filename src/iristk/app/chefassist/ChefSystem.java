@@ -25,7 +25,7 @@ public class ChefSystem {
 		controller = new ChefController(system);
 		
 		//Start IrisTK + chef app
-		system.addModule(new ChefFlow(controller)); //Construct ChefFlow.xml first
+		system.addModule(new ChefFlow(controller));
 		system.loadContext("default", new SpeechGrammarContext(new SRGSGrammar(getClass().getResource("ChefGrammar.xml").toURI())));			
 		system.sendStartSignal();
 	}
