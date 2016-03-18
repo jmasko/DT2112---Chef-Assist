@@ -45,6 +45,7 @@ public class ChefFlow extends IrisModule{
         	String input = event.getString("text");
             if (input != null && input.length() > 0) {
             	states[currentState].handleEvent(this, event);
+            	listen();
             } else {
             	listen();
             }
@@ -65,4 +66,12 @@ public class ChefFlow extends IrisModule{
 
     }
 
+    public void setState(int state){
+    	this.currentState = state;
+    }
+    
+    public ChefController getController(){
+    	return controller;
+    }
+    
 }

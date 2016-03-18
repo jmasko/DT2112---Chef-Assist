@@ -16,6 +16,10 @@ public class ChefController {
 		return currentRecipe;
 	}
 	
+	public void setCurrentRecipeIndex(int index){
+		currentRecipe = recipes[index];
+	}
+	
 	private Recipe[] buildTemporaryHardcodedRecipes(){
 		Recipe[] r = new Recipe[1];
 		
@@ -43,7 +47,7 @@ public class ChefController {
 				"Pour the mixture into the two baking pans. Place the pans into another larger baking tray. Add hot water in the tray up to halfway and bake for about 50 to 60 minutes. Test with a needle or skewer that comes out clean.",
 				"Turn off the oven. Leave the oven door slightly open for 10 minutes. Remove from the oven and remove from the pans. Let cool completely on a wire rack. Chill in a fridge for about 3 hours then the cake will be ready to be served."
 		};
-		r[1] = new Recipe("Manly Meetballs", directions, ingredients);
+		r[0] = new Recipe("Japanese Cheesecake", directions, ingredients);
 		
 		return r;
 	}

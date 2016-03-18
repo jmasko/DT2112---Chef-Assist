@@ -5,28 +5,106 @@
 	
  	<rule id="root" scope="public">
         <one-of>
-            <item>yes<tag>out.yes=1</tag></item>
+        	<item>yes<tag>out.yes=1</tag></item>
+        	
             <item>no<tag>out.no=1</tag></item>
+            
             <item>next<tag>out.output="next"</tag></item>
             <item>next instruction<tag>out.output="next"</tag></item>
             <item>next direction<tag>out.output="next"</tag></item>
-            <item>back</item>
-            <item>repeat</item>
-            <item>repeat all steps</item>
-            <item>repeat ingredient</item>
-            <item>repeat all ingredient</item>
-            <item>read directions</item>
-            <item>how much
+            <item>read directions<tag>out.output="next"</tag></item>
+            <item>next step<tag>out.output="next"</tag></item>
+
+            <item>
+            	<item repeat="0-1">
+					<one-of>
+						<item>what's</item>
+						<item>what is</item>
+						<item>repeat</item>
+						<item>say</item>
+					</one-of>
+				</item>
+				<item repeat="0-1">
+					<one-of>
+						<item>all</item>
+						<item>all of</item>
+					</one-of>
+					<tag>out.all=1</tag>
+				</item>
+				<item repeat="0-1">the</item>
+				<item repeat="0-1">next<tag>out.output="next"</tag></item>
+				<item repeat="0-1">
+					<one-of>
+						<item>previous</item>
+						<item>last</item>
+						<item>back</item>
+					</one-of>
+					<tag>out.output="back"</tag>
+				</item>
+				<item repeat="0-1">
+					<one-of>
+						<item>instruction</item>
+						<item>direction</item>
+						<item>step</item>
+					</one-of>
+				</item>
+			</item>
+			<item>back<tag>out.output="back"</tag></item>
+            <item>back one step<tag>out.output="back"</tag></item>
+            
+            <item>
+           		<one-of>
+					<item>how much</item>
+					<item>how many</item>
+					<item>what's the amount of</item>
+				</one-of>
+				<item repeat="0-1">of</item>
                 <ruleref uri="#ingredientName" />
+                <tag>out.output="howmuch"</tag>
+            </item>
+            
+             <item>
+             <item repeat="0-1">
+	             <one-of>
+	             	<item>I would like to</item>
+					<item>I want to</item>
+					<item>Can you</item>
+					<item>Help me to</item>
+					<item>Help me</item>
+				</one-of>
+			</item>
+             <item repeat="0-1">
+	             <one-of>
+	             	<item>cook</item>
+					<item>read</item>
+					<item>load</item>
+					<item>lookup</item>
+				</one-of>
+			</item>
+			<item repeat="0-1">the</item>
+			<item repeat="0-1">recipe</item>
+			<item repeat="0-1">for</item>
+			<item>
+            	<one-of>
+            		<item>Japanese Cheesecake<tag>out.recipe=0</tag></item>
+       			</one-of>
+       		</item>
+            <tag>out.output="recipe"</tag>
             </item>
         </one-of>
     </rule>
     <rule id="ingredientName">
         <one-of>
-            <item>lemon</item>
-            <item>apple</item>
-            <item>salt</item>
-            <item>computer</item>
+            <item>cream cheese<tag>out.ingredient="cream cheese"</tag></item>
+            <item>milk<tag>out.ingredient="milk"</tag></item>
+            <item>butter<tag>out.ingredient="butter"</tag></item>
+            <item>egg yolks<tag>out.ingredient="egg yolks"</tag></item>
+            <item>cake flour<tag>out.ingredient="cake flour"</tag></item>
+            <item>corn flour<tag>out.ingredient="corn flour"</tag></item>
+            <item>lemon zest<tag>out.ingredient="lemon zest"</tag></item>
+            <item>egg whites<tag>out.ingredient="egg whites"</tag></item>
+            <item>cream of tartar<tag>out.ingredient="cream of tartar"</tag></item>
+            <item>sugar<tag>out.ingredient="sugar"</tag></item>
         </one-of>
     </rule>
 	
