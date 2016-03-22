@@ -1,6 +1,7 @@
 # DT2112---Chef-Assist
 DT2112 Awesomeness
 
+I wrote the code lines first then the descrptions under them!
 
 GuessFlow.java file
 
