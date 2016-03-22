@@ -8,7 +8,8 @@
         	<item>yes<tag>out.yes=1</tag></item>
         	
             <item>no<tag>out.no=1</tag></item>
-            
+			<item>end</item>
+			<item>ingredient</item>
             <item>next<tag>out.output="next"</tag></item>
             <item>next instruction<tag>out.output="next"</tag></item>
             <item>next direction<tag>out.output="next"</tag></item>

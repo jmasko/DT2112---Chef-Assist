@@ -26,7 +26,37 @@
 	        <reentry/>
 	    </onevent>
 	</state>
-	
+
+	<state id="Recipie" extends="Dialog">
+		<onentry>
+
+			<dialog:listen/>
+		</onentry>
+		<onevent name="sense.user.speak">
+
+		</onevent>
+	</state>
+
+	<state id="IngredientMode" extends="Dialog">
+		<onentry>
+
+			<dialog:listen/>
+		</onentry>
+		<onevent name="sense.user.speak">
+
+		</onevent>
+	</state>
+
+	<state id="Steps" extends="Dialog">
+		<onentry>
+
+			<dialog:listen/>
+		</onentry>
+		<onevent name="sense.user.speak">
+
+		</onevent>
+	</state>
+
 	<state id="Initial" extends="Dialog">
 		<onentry>
 			<exec>message = "Hello! I will assist you in cooking. What would you like to cook?"</exec>
