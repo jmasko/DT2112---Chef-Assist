@@ -10,7 +10,7 @@ public class GuessFlow extends iristk.flow.Flow {
 
 	private Integer number;
 	private Integer guesses;
-	
+
 	public static String[] steps = {
 			"step 1", "step 2", "step 3","step 4","step 5", "step 6",
 			"step 7","step 8","step 9"
@@ -22,8 +22,33 @@ public class GuessFlow extends iristk.flow.Flow {
 			"step 7 ingredient","step 8 ingredient","step 9 ingredient",
 			"step 10 ingredient"
 	};
-	
-	private Integer index;
+
+	public static Ingredient[] ingredientList = new Ingredient[]{
+			new Ingredient("cream cheese", "softened", 250, "g"),
+			new Ingredient("milk", 250, "ml"),
+			new Ingredient("butter", "softened", 60, "g"),
+			new Ingredient("egg yolks", 6),
+			new Ingredient("cake flour", 55, "g"),
+			new Ingredient("corn flour", 20, "g"),
+			new Ingredient("lemon zest", 1),
+			new Ingredient("egg whites", 6),
+			new Ingredient("cream of tartar", 0.25, "tsp"),
+			new Ingredient("sugar", 130, "g"),
+	};
+
+	public static String[] directions = new String[]{
+			"Preheat oven to 150 degrees celcius",
+			"Use a large bowl, pour in milk. Place the bowl over simmering water. Don’t let the bottom of the bowl touch the water. ",
+			"Add cream cheese, stir occasionally until completely dissolved and the mixture turns smooth. Stir in butter, till dissolved. ",
+			"Remove the mixture from heat and let it cool down a bit, then add the egg yolks and mix well.",
+			"Mix the cake flour and corn flour. Sift in the flours into the cream cheese mixture, a small amount at a time. Mix well between every addition, and make sure there aren’t any flour lumps. Stir in freshly grated zest. Set aside.",
+			"Place egg whites in a large clean bowl. Use an electric mixer to beat the egg whites for 3 minutes, then add cream of tartar and blend again. Pour sugar in the egg whites and blend until very the mixture becomes half solid. ",
+			"Add the egg whites into the cream cheese mixture gently with a rubber spatula just until all ingredients are mixed well. Do not stir or beat. ",
+			"Pour the mixture into the two baking pans. Place the pans into another larger baking tray. Add hot water in the tray up to halfway and bake for about 50 to 60 minutes. Test with a needle or skewer that comes out clean.",
+			"Turn off the oven. Leave the oven door slightly open for 10 minutes. Remove from the oven and remove from the pans. Let cool completely on a wire rack. Chill in a fridge for about 3 hours then the cake will be ready to be served."
+	};
+
+	private Integer index, ingredientIndex = 0;
 
 	private void initVariables() {
 	}
@@ -35,7 +60,7 @@ public class GuessFlow extends iristk.flow.Flow {
 	public void setNumber(Integer value) {
 		this.number = value;
 	}
-	
+
 	public Integer getIndex(){
 		return this.index;
 	}
@@ -43,7 +68,7 @@ public class GuessFlow extends iristk.flow.Flow {
 	public void setIndex(Integer value){
 		this.index = value;
 	}
-	
+
 	public Integer getGuesses() {
 		return this.guesses;
 	}
@@ -70,7 +95,7 @@ public class GuessFlow extends iristk.flow.Flow {
 
 	private class IngredientMode extends Dialog{
 		final State currentState = this;
-		
+
 		@Override
 		public void setFlowThread(FlowRunner.FlowThread flowThread) {
 			super.setFlowThread(flowThread);
@@ -95,7 +120,7 @@ public class GuessFlow extends iristk.flow.Flow {
 			if (event.triggers("sense.user.speak")) {
 				eventResult = EVENT_CONSUMED;
 				EXECUTION: {
-					//indexOf != -1 means the given input string exists in the event string. 
+					//indexOf != -1 means the given input string exists in the event string.
 					if (event.getString("text").indexOf("step") != -1
 							|| event.getString("text").indexOf("direction") != -1){
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
@@ -109,10 +134,24 @@ public class GuessFlow extends iristk.flow.Flow {
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
-					else if (event.getString("text").indexOf("repeat all") != -1){
-						for (int i = 0; i < ingredients.length; i++) {
+					else if (event.getString("text").equals("repeat")){
+						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
+						Ingredient currentIngredient = ingredientList[ingredientIndex];
+						state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
+							eventResult = EVENT_ABORTED;
+							break EXECUTION;
+						}
+						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));
+						eventResult = EVENT_ABORTED;
+						break EXECUTION;
+					}
+					else if (event.getString("text").equals("repeat all")){
+						for (int i = 0; i < ingredientList.length; i++) {
+							Ingredient currentIngredient = ingredientList[i];
+
 							iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-							state3.setText(ingredients[i]);
+							state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName() );
 							if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 								eventResult = EVENT_ABORTED;
 								break EXECUTION;
@@ -126,10 +165,24 @@ public class GuessFlow extends iristk.flow.Flow {
 							|| event.getString("text").indexOf("how many") != -1
 							|| event.getString("text").indexOf("what's the amount of") != -1)
 					{
-						String inputText = event.getString("text");
-						String testVar = inputText.substring(inputText.lastIndexOf(" "), inputText.length());
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-						state3.setText("you want to know the quantity of: " + testVar);
+						String inputText = event.getString("text");
+						String testVar = inputText.substring(inputText.lastIndexOf(" ")+1, inputText.length());
+
+						boolean isFound = false;
+						for(int i = 0; i < ingredientList.length; i++){
+							Ingredient currentIngredient = ingredientList[i];
+							System.out.println(currentIngredient.getName() + " ----------- " + testVar);
+							if(currentIngredient.getName().indexOf(testVar) != -1){
+								state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+								isFound = true;
+							}
+						}
+
+						if(!isFound){
+							state3.setText("ingredient you wanted to know is not found in the system. Please say it again.");
+						}
+
 						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
@@ -140,35 +193,60 @@ public class GuessFlow extends iristk.flow.Flow {
 					}
 					else if (event.getString("text").indexOf("next") != -1){
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-						state3.setText("next ingredient.");
+						System.out.println("next: " + ingredientIndex);
+						if(ingredientIndex < ingredientList.length)
+						{
+							ingredientIndex++;
+							Ingredient currentIngredient = ingredientList[ingredientIndex];
+							state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+
+						}
+						else
+						{
+							Ingredient currentIngredient = ingredientList[ingredientList.length-1];
+							state3.setText("this is the last one. " + currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+						}
 						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
 						}
-						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));						
+						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
 					else if (event.getString("text").indexOf("previous") != -1
 							||event.getString("text").indexOf("back") != -1){
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-						state3.setText("previous ingredient.");
+						System.out.println("back: " + ingredientIndex);
+						if(ingredientIndex == 0)
+						{
+							Ingredient currentIngredient = ingredientList[0];
+							state3.setText("this is the first ingredient. " + currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+						}
+						else
+						{
+							ingredientIndex--;
+							Ingredient currentIngredient = ingredientList[ingredientIndex];
+							state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
+						}
+
 						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
 						}
-						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));						
+						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
-					else if (event.getString("text").equals("last")){
+					else if (event.getString("text").indexOf("last") != -1){
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-						state3.setText("last ingredient.");
+						Ingredient currentIngredient = ingredientList[ingredientList.length-1];
+						state3.setText(currentIngredient.getAmount() + " " + UnitTranslator.translate(currentIngredient.getUnit()) + " of " + currentIngredient.getName());
 						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
 						}
-						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));						
+						flowThread.reentryState(this, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 29, 15)));
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
@@ -187,7 +265,7 @@ public class GuessFlow extends iristk.flow.Flow {
 					}
 					else{
 						iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-						state3.setText("No comprende amigo.");
+						state3.setText("I did not understand your input.");
 						if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
@@ -206,10 +284,10 @@ public class GuessFlow extends iristk.flow.Flow {
 			return EVENT_IGNORED;
 		}
 	}
-	
+
 	private class Step extends Dialog{
 		final State currentState = this;
-		
+
 		@Override
 		public void setFlowThread(FlowRunner.FlowThread flowThread) {
 			super.setFlowThread(flowThread);
@@ -220,6 +298,7 @@ public class GuessFlow extends iristk.flow.Flow {
 			int eventResult;
 			Event event = new Event("state.enter");
 			EXECUTION: {
+
 				iristk.flow.DialogFlow.listen state2 = new iristk.flow.DialogFlow.listen();
 				if (!flowThread.callState(state2, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 19, 12)))) {
 					eventResult = EVENT_ABORTED;
@@ -246,9 +325,9 @@ public class GuessFlow extends iristk.flow.Flow {
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
-					else if((event.getString("text").equals("repeat step"))){
+					else if((event.getString("text").equals("repeat"))){
 						iristk.flow.DialogFlow.say state5 = new iristk.flow.DialogFlow.say();
-						state5.setText(steps[index]);
+						state5.setText(directions[index]);
 						if (!flowThread.callState(state5, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
@@ -257,11 +336,11 @@ public class GuessFlow extends iristk.flow.Flow {
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
-					else if((event.getString("text").equals("repeat all steps"))){
-						for(int i = 0; i < steps.length; i++)
+					else if(event.getString("text").equals("repeat all step")){
+						for(int i = 0; i < directions.length; i++)
 						{
 							iristk.flow.DialogFlow.say state3 = new iristk.flow.DialogFlow.say();
-							state3.setText(steps[i]);
+							state3.setText(directions[i]);
 							if (!flowThread.callState(state3, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 								eventResult = EVENT_ABORTED;
 								break EXECUTION;
@@ -273,9 +352,9 @@ public class GuessFlow extends iristk.flow.Flow {
 					}
 					else if((event.getString("text").equals("next"))){
 						iristk.flow.DialogFlow.say state5 = new iristk.flow.DialogFlow.say();
-						if(index < 9){
+						if(index < directions.length){
 							index++;
-							state5.setText(steps[index]);
+							state5.setText(directions[index]);
 						}
 						if (!flowThread.callState(state5, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
@@ -290,14 +369,14 @@ public class GuessFlow extends iristk.flow.Flow {
 						iristk.flow.DialogFlow.say state5 = new iristk.flow.DialogFlow.say();
 						if(index == 0)
 						{
-							state5.setText(steps[0]);
+							state5.setText(directions[0]);
 						}
 						else
 						{
 							index--;
-							state5.setText(steps[index]);
+							state5.setText(directions[index]);
 						}
-						state5.setText(steps[index]);
+
 						if (!flowThread.callState(state5, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 24, 53)))) {
 							eventResult = EVENT_ABORTED;
 							break EXECUTION;
@@ -306,7 +385,7 @@ public class GuessFlow extends iristk.flow.Flow {
 						eventResult = EVENT_ABORTED;
 						break EXECUTION;
 					}
-					else if((event.getString("text").equals("ingredient")))
+					else if((event.getString("text").indexOf("ingredient") != -1))
 					{
 						iristk.flow.DialogFlow.say state5 = new iristk.flow.DialogFlow.say();
 						state5.setText("now going to ingredient state.");
@@ -341,7 +420,7 @@ public class GuessFlow extends iristk.flow.Flow {
 			return EVENT_IGNORED;
 		}
 	}
-	
+
 	//initial state. Your "InitState"
 	private class Start extends State {
 
@@ -362,8 +441,9 @@ public class GuessFlow extends iristk.flow.Flow {
 				guesses = 0;
 				index = 0;
 				iristk.flow.DialogFlow.say state0 = new iristk.flow.DialogFlow.say();
-				state0.setText("Welcome to Chef's assistant application. We have one recepie so "
-						+ "it will start loading now.");
+				state0.setText("Welcome to Chef's assistant application. We have one recipe so "
+						+ "it will start loading now. You will be in the ingredient state and you can start "
+						+ "to navigate by saying ,for example, next  and back.  ");
 				if (!flowThread.callState(state0, new FlowEventInfo(currentState, event, new XMLLocation(new File("C:\\Dropbox\\iristk\\app\\guess\\src\\iristk\\app\\guess\\GuessFlow.xml"), 10, 12)))) {
 					eventResult = EVENT_ABORTED;
 					break EXECUTION;
@@ -377,7 +457,7 @@ public class GuessFlow extends iristk.flow.Flow {
 
 		@Override
 		public int onFlowEvent(Event event) {
-	
+
 			return EVENT_IGNORED;
 		}
 
